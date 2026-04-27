@@ -9,16 +9,16 @@ arch:
   - armv7
 
 ingress: true
-ingress_port: 8000
+ingress_port: 8001
 ingress_stream: false
 
 panel_icon: "mdi:food-variant"
 panel_title: "Madplan"
 
 ports:
-  8000/tcp: 8000
+  8001/tcp: 8001
 ports_description:
-  8000/tcp: "Madplan Web UI (direct access)"
+  8001/tcp: "Madplan Web UI (direct access)"
 
 options:
   openai_api_key: ""
