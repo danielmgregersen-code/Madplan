@@ -2,6 +2,9 @@ import json
 from datetime import date, timedelta
 from openai import OpenAI
 
+_DANISH_DAYS = ["Mandag", "Tirsdag", "Onsdag", "Torsdag", "Fredag", "Lørdag", "Søndag"]
+_DANISH_MONTHS = ["jan", "feb", "mar", "apr", "maj", "jun", "jul", "aug", "sep", "okt", "nov", "dec"]
+
 TOOL_UPDATE_MEALS = {
     "type": "function",
     "function": {
@@ -83,21 +86,25 @@ Alle retter skal:
   - Weekendretter må gerne tage op til 90 min
   - Vær præcis — skriv "25 min" ikke "ca. 30 min"
 
+Uger starter ALTID på mandag (europæisk standard). Når brugeren nævner en ugedag, slå datoen op direkte i madplanen nedenfor — beregn den aldrig ud fra ugedagsnummer.
+
 Når brugeren beder om ændringer, brug update_meals-værktøjet til at anvende dem, og bekræft kort hvad du ændrede."""
 
 
 def _format_plan_for_context(meal_plan: dict, week_start: date, weeks: int = 3) -> str:
-    lines = ["Nuværende madplan:"]
+    # Use Danish day names derived from weekday() (0=Mandag … 6=Søndag, Monday-first).
+    # The ISO date is included explicitly so the agent never has to compute it.
+    lines = ["Nuværende madplan (uger starter mandag):"]
     for i in range(weeks * 7):
         d = week_start + timedelta(days=i)
         key = d.isoformat()
-        day_name = d.strftime("%A %d %b")
+        day_label = f"{_DANISH_DAYS[d.weekday()]} {d.day}. {_DANISH_MONTHS[d.month - 1]} ({key})"
         day_data = meal_plan.get(key, {})
         veg = day_data.get("vegetarian", {})
         kids = day_data.get("kids", {})
         veg_str = veg.get("name", "—") if veg else "—"
         kids_str = kids.get("name", "—") if kids else "—"
-        lines.append(f"  {day_name}: vegetar={veg_str}, børn={kids_str}")
+        lines.append(f"  {day_label}: vegetar={veg_str}, børn={kids_str}")
     return "\n".join(lines)
 
 
