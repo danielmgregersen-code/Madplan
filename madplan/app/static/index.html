@@ -296,7 +296,7 @@ function formatDayDate(d) {
 
 // ── Load plan ── //
 async function loadPlan() {
-  const res = await fetch('/api/plan');
+  const res = await fetch('api/plan');
   if (!res.ok) return;
   state.plan = await res.json();
   renderGrid();
@@ -406,7 +406,7 @@ document.getElementById('modal-save').addEventListener('click', async () => {
   const name = document.getElementById('modal-name').value.trim();
   if (!name) { showToast('Please enter a meal name'); return; }
   const desc = document.getElementById('modal-desc').value.trim();
-  await fetch('/api/meal', {
+  await fetch('api/meal', {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ date: editTarget.date, meal_type: editTarget.mealType, name, description: desc }),
@@ -420,7 +420,7 @@ document.getElementById('modal-save').addEventListener('click', async () => {
 
 document.getElementById('modal-delete').addEventListener('click', async () => {
   if (!editTarget) return;
-  await fetch(`/api/meal?date_str=${editTarget.date}&meal_type=${editTarget.mealType}`, { method: 'DELETE' });
+  await fetch(`api/meal?date_str=${editTarget.date}&meal_type=${editTarget.mealType}`, { method: 'DELETE' });
   if (state.plan[editTarget.date]) {
     state.plan[editTarget.date][editTarget.mealType] = null;
   }
@@ -448,7 +448,7 @@ document.getElementById('generate-btn').addEventListener('click', async () => {
   btn.innerHTML = '<span class="spinner"></span>';
 
   try {
-    const res = await fetch('/api/generate', {
+    const res = await fetch('api/generate', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ week_offset: state.weekOffset }),
@@ -484,7 +484,7 @@ document.getElementById('chat-toggle').addEventListener('click', () => {
 });
 
 async function loadChatHistory() {
-  const res = await fetch('/api/chat-history');
+  const res = await fetch('api/chat-history');
   if (!res.ok) return;
   const history = await res.json();
   const container = document.getElementById('chat-messages');
@@ -519,7 +519,7 @@ async function sendChat() {
   appendMessage('user', message);
 
   try {
-    const res = await fetch('/api/chat', {
+    const res = await fetch('api/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ message, week_offset: state.weekOffset }),
