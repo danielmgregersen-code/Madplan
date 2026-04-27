@@ -1,6 +1,6 @@
 name: "Madplan"
 description: "AI-powered vegetarian family meal planner with weekly overview and chat interface."
-version: "1.0.4"
+version: "1.1.0"
 slug: "madplan"
 init: false
 arch:

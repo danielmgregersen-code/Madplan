@@ -1,10 +1,10 @@
 import json
 import os
 from datetime import date, timedelta
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import FastAPI, HTTPException
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import HTMLResponse
 from pydantic import BaseModel
+from typing import List
 from agent import MealPlanAgent
 
 OPTIONS_FILE = "/data/options.json"
@@ -19,9 +19,9 @@ def load_options() -> dict:
             return json.load(f)
     return {
         "openai_api_key": os.getenv("OPENAI_API_KEY", ""),
-        "chat_model": os.getenv("CHAT_MODEL", "gpt-4.1"),
+        "chat_model": os.getenv("CHAT_MODEL", "gpt-5.5"),
         "num_adults": int(os.getenv("NUM_ADULTS", "2")),
-        "num_children": int(os.getenv("NUM_CHILDREN", "2")),
+        "num_children": int(os.getenv("NUM_CHILDREN", "3")),
     }
 
 
@@ -40,7 +40,7 @@ def save_meal_plan(plan: dict):
         with open(MEAL_PLAN_FILE, "w") as f:
             json.dump(plan, f)
     except IOError as e:
-        print(f"Warning: could not save meal plan: {e}", flush=True)
+        print(f"Advarsel: kunne ikke gemme madplan: {e}", flush=True)
 
 
 def load_chat_history() -> list:
@@ -58,7 +58,7 @@ def save_chat_history(history: list):
         with open(CHAT_HISTORY_FILE, "w") as f:
             json.dump(history, f)
     except IOError as e:
-        print(f"Warning: could not save chat history: {e}", flush=True)
+        print(f"Advarsel: kunne ikke gemme chathistorik: {e}", flush=True)
 
 
 def monday_of_week(d: date) -> date:
@@ -69,7 +69,10 @@ def make_agent() -> MealPlanAgent:
     opts = load_options()
     api_key = opts.get("openai_api_key", "").strip()
     if not api_key:
-        raise HTTPException(status_code=400, detail="OpenAI API key is not configured. Set it in the add-on configuration.")
+        raise HTTPException(
+            status_code=400,
+            detail="OpenAI API-nøgle er ikke konfigureret. Angiv den i add-on konfigurationen."
+        )
     return MealPlanAgent(
         api_key=api_key,
         model=opts.get("chat_model", "gpt-5.5"),
@@ -80,9 +83,11 @@ def make_agent() -> MealPlanAgent:
 
 app = FastAPI(title="Madplan")
 
+EMPTY_DAY = {"vegetarian": None, "kids": None}
+
 
 class GenerateRequest(BaseModel):
-    week_offset: int = 0  # 0 = current week, 1 = next week, 2 = week after
+    week_offset: int = 0
 
 
 class ChatRequest(BaseModel):
@@ -91,10 +96,12 @@ class ChatRequest(BaseModel):
 
 
 class UpdateMealRequest(BaseModel):
-    date: str       # YYYY-MM-DD
-    meal_type: str  # "lunch" or "dinner"
+    date: str
+    meal_type: str          # "vegetarian" or "kids"
     name: str
     description: str = ""
+    ingredients: List[str] = []
+    instructions: str = ""
 
 
 @app.get("/api/plan")
@@ -106,7 +113,7 @@ def get_plan():
     for i in range(21):
         d = week_start + timedelta(days=i)
         key = d.isoformat()
-        result[key] = plan.get(key, {"lunch": None, "dinner": None})
+        result[key] = plan.get(key, dict(EMPTY_DAY))
     return result
 
 
@@ -127,7 +134,7 @@ async def generate_week(req: GenerateRequest):
     for i in range(7):
         d = week_start + timedelta(days=i)
         key = d.isoformat()
-        result[key] = updated.get(key, {"lunch": None, "dinner": None})
+        result[key] = updated.get(key, dict(EMPTY_DAY))
     return result
 
 
@@ -155,12 +162,17 @@ async def chat(req: ChatRequest):
 
 @app.put("/api/meal")
 async def update_meal(req: UpdateMealRequest):
-    if req.meal_type not in ("lunch", "dinner"):
-        raise HTTPException(status_code=400, detail="meal_type must be 'lunch' or 'dinner'")
+    if req.meal_type not in ("vegetarian", "kids"):
+        raise HTTPException(status_code=400, detail="meal_type skal være 'vegetarian' eller 'kids'")
     plan = load_meal_plan()
     if req.date not in plan:
         plan[req.date] = {}
-    plan[req.date][req.meal_type] = {"name": req.name, "description": req.description}
+    plan[req.date][req.meal_type] = {
+        "name": req.name,
+        "description": req.description,
+        "ingredients": req.ingredients,
+        "instructions": req.instructions,
+    }
     save_meal_plan(plan)
     return {"ok": True}
 

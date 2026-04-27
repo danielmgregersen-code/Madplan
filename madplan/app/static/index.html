@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="da">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,7 +11,6 @@
     --border: #252a3a; --accent: #4af0a0; --accent2: #f0c44a;
     --text: #e8eaf0; --muted: #5a6080;
     --radius: 12px;
-    --lunch-color: #4af0a0; --dinner-color: #f0c44a;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { background: var(--bg); color: var(--text); font-family: 'DM Mono', monospace; height: 100dvh; display: flex; flex-direction: column; overflow: hidden; }
@@ -20,61 +19,33 @@
   header {
     background: var(--surface); border-bottom: 1px solid var(--border);
     padding: 12px 20px; display: flex; align-items: center;
-    justify-content: space-between; flex-shrink: 0; gap: 12px; z-index: 10;
-    flex-wrap: wrap;
+    justify-content: space-between; flex-shrink: 0; gap: 12px; flex-wrap: wrap;
   }
   .header-left { display: flex; align-items: center; gap: 12px; }
-  .logo {
-    width: 36px; height: 36px; background: var(--accent); border-radius: 8px;
-    display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 20px;
-  }
+  .logo { width: 36px; height: 36px; background: var(--accent); border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 20px; }
   .header-text h1 { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 15px; letter-spacing: 0.02em; }
   .header-text p { font-size: 11px; color: var(--muted); margin-top: 1px; }
 
   .week-tabs { display: flex; gap: 4px; }
-  .tab {
-    background: none; border: 1px solid var(--border); color: var(--muted);
-    font-family: 'DM Mono', monospace; font-size: 11px; padding: 6px 12px;
-    border-radius: 8px; cursor: pointer; transition: all 0.15s;
-  }
+  .tab { background: none; border: 1px solid var(--border); color: var(--muted); font-family: 'DM Mono', monospace; font-size: 11px; padding: 6px 12px; border-radius: 8px; cursor: pointer; transition: all 0.15s; }
   .tab:hover { border-color: var(--accent); color: var(--accent); }
   .tab.active { border-color: var(--accent); color: var(--accent); background: rgba(74,240,160,0.08); }
 
-  .header-right { display: flex; align-items: center; gap: 8px; }
-  .btn {
-    background: var(--accent); border: none; color: #0d0f14;
-    font-family: 'DM Mono', monospace; font-size: 11px; font-weight: 500;
-    padding: 7px 14px; border-radius: 8px; cursor: pointer; transition: opacity 0.15s;
-  }
+  .btn { background: var(--accent); border: none; color: #0d0f14; font-family: 'DM Mono', monospace; font-size: 11px; font-weight: 500; padding: 7px 14px; border-radius: 8px; cursor: pointer; transition: opacity 0.15s; }
   .btn:hover { opacity: 0.85; }
   .btn:disabled { opacity: 0.4; cursor: not-allowed; }
-  .btn-ghost {
-    background: none; border: 1px solid var(--border); color: var(--muted);
-    font-family: 'DM Mono', monospace; font-size: 11px;
-    padding: 6px 12px; border-radius: 8px; cursor: pointer; transition: all 0.15s;
-  }
+  .btn-ghost { background: none; border: 1px solid var(--border); color: var(--muted); font-family: 'DM Mono', monospace; font-size: 11px; padding: 6px 12px; border-radius: 8px; cursor: pointer; transition: all 0.15s; }
   .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
 
-  /* ── Main layout ── */
+  /* ── Main ── */
   .main { display: flex; flex-direction: column; flex: 1; overflow: hidden; }
 
-  /* ── Meal grid ── */
-  #grid-container {
-    flex: 1; overflow-x: auto; overflow-y: auto; padding: 16px;
-  }
-  .meal-grid {
-    display: grid;
-    grid-template-columns: repeat(7, minmax(140px, 1fr));
-    gap: 10px;
-    min-width: 980px;
-  }
+  #grid-container { flex: 1; overflow-x: auto; overflow-y: auto; padding: 16px; }
+  .meal-grid { display: grid; grid-template-columns: repeat(7, minmax(150px, 1fr)); gap: 10px; min-width: 1050px; }
 
   .day-col { display: flex; flex-direction: column; gap: 8px; }
 
-  .day-header {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: 8px; padding: 8px 10px; text-align: center;
-  }
+  .day-header { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px; text-align: center; }
   .day-name { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 12px; }
   .day-date { font-size: 10px; color: var(--muted); margin-top: 2px; }
   .day-header.today { border-color: var(--accent); }
@@ -83,109 +54,83 @@
   .meal-card {
     background: var(--surface); border: 1px solid var(--border);
     border-radius: var(--radius); padding: 10px; cursor: pointer;
-    transition: border-color 0.15s; min-height: 90px; position: relative;
-    display: flex; flex-direction: column; gap: 4px;
+    transition: border-color 0.15s, background 0.15s;
+    min-height: 80px; display: flex; flex-direction: column; gap: 4px;
   }
-  .meal-card:hover { border-color: var(--surface2); background: var(--surface2); }
-  .meal-label {
-    font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; font-weight: 500;
-  }
-  .meal-label.lunch { color: var(--lunch-color); }
-  .meal-label.dinner { color: var(--dinner-color); }
+  .meal-card:hover { border-color: var(--accent); background: var(--surface2); }
+  .meal-label { font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; font-weight: 500; }
+  .meal-label.vegetarian { color: var(--accent); }
+  .meal-label.kids { color: var(--accent2); }
   .meal-name { font-size: 12px; color: var(--text); line-height: 1.4; flex: 1; }
-  .meal-desc { font-size: 10px; color: var(--muted); line-height: 1.4; }
   .meal-empty { font-size: 11px; color: var(--muted); font-style: italic; flex: 1; display: flex; align-items: center; }
-  .meal-edit-btn {
-    position: absolute; top: 6px; right: 6px;
-    background: none; border: none; color: var(--muted); font-size: 13px;
-    cursor: pointer; opacity: 0; transition: opacity 0.15s; line-height: 1;
-  }
-  .meal-card:hover .meal-edit-btn { opacity: 1; }
-  .meal-edit-btn:hover { color: var(--accent); }
+  .meal-has-recipe { font-size: 9px; color: var(--muted); margin-top: 2px; }
 
   /* ── Chat panel ── */
-  #chat-panel {
-    background: var(--surface); border-top: 1px solid var(--border);
-    flex-shrink: 0; display: flex; flex-direction: column;
-    transition: height 0.25s ease;
-    height: 48px; overflow: hidden;
-  }
+  #chat-panel { background: var(--surface); border-top: 1px solid var(--border); flex-shrink: 0; display: flex; flex-direction: column; transition: height 0.25s ease; height: 48px; overflow: hidden; }
   #chat-panel.open { height: 300px; }
-
-  #chat-toggle {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 12px 16px; cursor: pointer; user-select: none; flex-shrink: 0;
-    font-size: 12px; color: var(--muted);
-  }
+  #chat-toggle { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; cursor: pointer; user-select: none; flex-shrink: 0; font-size: 12px; color: var(--muted); }
   #chat-toggle:hover { color: var(--text); }
-  #chat-toggle .toggle-label { display: flex; align-items: center; gap: 8px; }
   #chat-toggle .chevron { font-size: 10px; transition: transform 0.2s; }
   #chat-panel.open #chat-toggle .chevron { transform: rotate(180deg); }
-
-  #chat-messages {
-    flex: 1; overflow-y: auto; padding: 0 16px 8px; display: flex; flex-direction: column; gap: 8px;
-  }
+  #chat-messages { flex: 1; overflow-y: auto; padding: 0 16px 8px; display: flex; flex-direction: column; gap: 8px; }
   #chat-messages::-webkit-scrollbar { width: 3px; }
   #chat-messages::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
-
   .msg { max-width: 80%; padding: 8px 12px; border-radius: 10px; font-size: 12px; line-height: 1.5; }
-  .msg.user { background: var(--surface2); border: 1px solid var(--border); align-self: flex-end; color: var(--text); }
-  .msg.assistant { background: rgba(74,240,160,0.07); border: 1px solid rgba(74,240,160,0.2); align-self: flex-start; color: var(--text); }
-
-  #chat-input-row {
-    display: flex; gap: 8px; padding: 8px 16px 12px; flex-shrink: 0;
-  }
-  #chat-input {
-    flex: 1; background: var(--surface2); border: 1px solid var(--border);
-    color: var(--text); font-family: 'DM Mono', monospace; font-size: 12px;
-    padding: 8px 12px; border-radius: 8px; resize: none; height: 38px;
-    transition: border-color 0.15s; outline: none;
-  }
+  .msg.user { background: var(--surface2); border: 1px solid var(--border); align-self: flex-end; }
+  .msg.assistant { background: rgba(74,240,160,0.07); border: 1px solid rgba(74,240,160,0.2); align-self: flex-start; }
+  #chat-input-row { display: flex; gap: 8px; padding: 8px 16px 12px; flex-shrink: 0; }
+  #chat-input { flex: 1; background: var(--surface2); border: 1px solid var(--border); color: var(--text); font-family: 'DM Mono', monospace; font-size: 12px; padding: 8px 12px; border-radius: 8px; resize: none; height: 38px; outline: none; transition: border-color 0.15s; }
   #chat-input:focus { border-color: var(--accent); }
   #chat-input::placeholder { color: var(--muted); }
 
-  /* ── Edit modal ── */
-  .modal-overlay {
-    position: fixed; inset: 0; background: rgba(0,0,0,0.6);
-    display: flex; align-items: center; justify-content: center;
-    z-index: 100; padding: 20px;
-  }
+  /* ── Recipe modal ── */
+  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.65); display: flex; align-items: center; justify-content: center; z-index: 100; padding: 20px; }
   .modal-overlay.hidden { display: none; }
-  .modal {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: var(--radius); padding: 20px; width: 100%; max-width: 400px;
-    display: flex; flex-direction: column; gap: 14px;
-  }
-  .modal h2 { font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700; }
-  .modal label { font-size: 10px; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; display: block; margin-bottom: 4px; }
-  .modal input, .modal textarea {
-    width: 100%; background: var(--surface2); border: 1px solid var(--border);
-    color: var(--text); font-family: 'DM Mono', monospace; font-size: 12px;
-    padding: 8px 10px; border-radius: 8px; outline: none; transition: border-color 0.15s;
-  }
-  .modal input:focus, .modal textarea:focus { border-color: var(--accent); }
-  .modal textarea { resize: vertical; min-height: 60px; }
-  .modal-actions { display: flex; gap: 8px; justify-content: flex-end; }
+  .modal { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); width: 100%; max-width: 520px; max-height: 90dvh; display: flex; flex-direction: column; overflow: hidden; }
+
+  .modal-header { padding: 16px 20px 12px; border-bottom: 1px solid var(--border); flex-shrink: 0; display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+  .modal-header-text {}
+  .modal-meta { font-size: 10px; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 4px; }
+  .modal-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 16px; }
+  .modal-close { background: none; border: none; color: var(--muted); font-size: 20px; cursor: pointer; line-height: 1; padding: 2px; flex-shrink: 0; }
+  .modal-close:hover { color: var(--text); }
+
+  /* View mode */
+  .modal-body { flex: 1; overflow-y: auto; padding: 16px 20px; display: flex; flex-direction: column; gap: 16px; }
+  .modal-body::-webkit-scrollbar { width: 4px; }
+  .modal-body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  .recipe-description { font-size: 12px; color: var(--muted); line-height: 1.6; }
+
+  .recipe-section-label { font-size: 10px; color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 6px; }
+  .ingredients-list { list-style: none; display: flex; flex-direction: column; gap: 4px; }
+  .ingredients-list li { font-size: 12px; color: var(--text); padding: 5px 10px; background: var(--surface2); border-radius: 6px; line-height: 1.4; }
+  .instructions-text { font-size: 12px; color: var(--text); line-height: 1.8; white-space: pre-wrap; }
+
+  .modal-empty { font-size: 12px; color: var(--muted); font-style: italic; padding: 8px 0; }
+
+  .modal-footer { padding: 12px 20px; border-top: 1px solid var(--border); display: flex; gap: 8px; justify-content: flex-end; flex-shrink: 0; }
   .btn-danger { background: none; border: 1px solid #f06060; color: #f06060; font-family: 'DM Mono', monospace; font-size: 11px; padding: 6px 12px; border-radius: 8px; cursor: pointer; }
   .btn-danger:hover { background: rgba(240,96,96,0.1); }
 
+  /* Edit mode */
+  .edit-mode { display: none; flex-direction: column; gap: 12px; padding: 16px 20px; flex: 1; overflow-y: auto; }
+  .edit-mode.active { display: flex; }
+  .modal-body.hidden { display: none; }
+  .modal-footer.hidden { display: none; }
+
+  .edit-label { font-size: 10px; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; display: block; margin-bottom: 4px; }
+  .edit-input, .edit-textarea { width: 100%; background: var(--surface2); border: 1px solid var(--border); color: var(--text); font-family: 'DM Mono', monospace; font-size: 12px; padding: 8px 10px; border-radius: 8px; outline: none; transition: border-color 0.15s; }
+  .edit-input:focus, .edit-textarea:focus { border-color: var(--accent); }
+  .edit-textarea { resize: vertical; min-height: 80px; }
+  .edit-footer { padding: 12px 20px; border-top: 1px solid var(--border); display: flex; gap: 8px; justify-content: flex-end; flex-shrink: 0; }
+
   /* ── Spinner ── */
-  .spinner {
-    display: inline-block; width: 12px; height: 12px;
-    border: 2px solid rgba(74,240,160,0.3);
-    border-top-color: var(--accent);
-    border-radius: 50%; animation: spin 0.6s linear infinite;
-  }
+  .spinner { display: inline-block; width: 12px; height: 12px; border: 2px solid rgba(74,240,160,0.3); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.6s linear infinite; }
   @keyframes spin { to { transform: rotate(360deg); } }
 
   /* ── Toast ── */
-  #toast {
-    position: fixed; bottom: 60px; left: 50%; transform: translateX(-50%);
-    background: var(--surface); border: 1px solid var(--accent);
-    color: var(--text); font-size: 12px; padding: 8px 16px;
-    border-radius: 8px; z-index: 200; opacity: 0;
-    transition: opacity 0.2s; pointer-events: none;
-  }
+  #toast { position: fixed; bottom: 60px; left: 50%; transform: translateX(-50%); background: var(--surface); border: 1px solid var(--accent); color: var(--text); font-size: 12px; padding: 8px 16px; border-radius: 8px; z-index: 200; opacity: 0; transition: opacity 0.2s; pointer-events: none; }
   #toast.show { opacity: 1; }
 </style>
 </head>
@@ -196,18 +141,16 @@
     <div class="logo">🥗</div>
     <div class="header-text">
       <h1>Madplan</h1>
-      <p>Vegetarian family meal planner</p>
+      <p>Vegetarisk familiemadplan</p>
     </div>
   </div>
-
   <div class="week-tabs">
-    <button class="tab active" data-offset="0">This week</button>
-    <button class="tab" data-offset="1">Next week</button>
-    <button class="tab" data-offset="2">In 2 weeks</button>
+    <button class="tab active" data-offset="0">Denne uge</button>
+    <button class="tab" data-offset="1">Næste uge</button>
+    <button class="tab" data-offset="2">Om 2 uger</button>
   </div>
-
-  <div class="header-right">
-    <button class="btn" id="generate-btn">Generate week</button>
+  <div>
+    <button class="btn" id="generate-btn">Generer uge</button>
   </div>
 </header>
 
@@ -218,36 +161,68 @@
 
   <div id="chat-panel">
     <div id="chat-toggle">
-      <div class="toggle-label">
-        <span>Chat with assistant</span>
-        <span id="chat-status"></span>
-      </div>
+      <span>Snak med assistenten</span>
       <span class="chevron">▲</span>
     </div>
     <div id="chat-messages"></div>
     <div id="chat-input-row">
-      <textarea id="chat-input" placeholder="Ask the assistant to change something… e.g. 'Make Thursday dinner a soup' or 'Replace all lunches next week'"></textarea>
+      <textarea id="chat-input" placeholder="Bed assistenten om at ændre noget… fx 'Lav torsdag om til suppe' eller 'Byt alle børneretter næste uge'"></textarea>
       <button class="btn" id="send-btn">Send</button>
     </div>
   </div>
 </div>
 
-<!-- Edit meal modal -->
+<!-- Recipe modal -->
 <div class="modal-overlay hidden" id="modal-overlay">
   <div class="modal">
-    <h2 id="modal-title">Edit meal</h2>
-    <div>
-      <label>Meal name</label>
-      <input type="text" id="modal-name" placeholder="e.g. Pasta with tomato sauce">
+    <div class="modal-header">
+      <div class="modal-header-text">
+        <div class="modal-meta" id="modal-meta"></div>
+        <div class="modal-title" id="modal-title"></div>
+      </div>
+      <button class="modal-close" id="modal-close">✕</button>
     </div>
-    <div>
-      <label>Description (optional)</label>
-      <textarea id="modal-desc" placeholder="Brief description…"></textarea>
+
+    <!-- View mode -->
+    <div class="modal-body" id="modal-body">
+      <div class="recipe-description" id="recipe-description"></div>
+      <div id="ingredients-section">
+        <div class="recipe-section-label">Ingredienser</div>
+        <ul class="ingredients-list" id="ingredients-list"></ul>
+      </div>
+      <div id="instructions-section">
+        <div class="recipe-section-label">Fremgangsmåde</div>
+        <div class="instructions-text" id="instructions-text"></div>
+      </div>
     </div>
-    <div class="modal-actions">
-      <button class="btn-danger" id="modal-delete">Clear meal</button>
-      <button class="btn-ghost" id="modal-cancel">Cancel</button>
-      <button class="btn" id="modal-save">Save</button>
+    <div class="modal-footer" id="modal-footer">
+      <button class="btn-danger" id="modal-delete">Ryd ret</button>
+      <button class="btn-ghost" id="modal-edit-btn">Rediger</button>
+      <button class="btn" id="modal-close-btn">Luk</button>
+    </div>
+
+    <!-- Edit mode -->
+    <div class="edit-mode" id="edit-mode">
+      <div>
+        <label class="edit-label">Navn på retten</label>
+        <input type="text" class="edit-input" id="edit-name" placeholder="fx Pasta med tomatsauce">
+      </div>
+      <div>
+        <label class="edit-label">Kort beskrivelse</label>
+        <input type="text" class="edit-input" id="edit-description" placeholder="Kort beskrivelse…">
+      </div>
+      <div>
+        <label class="edit-label">Ingredienser (én per linje, med mængder)</label>
+        <textarea class="edit-textarea" id="edit-ingredients" placeholder="200g fusilli&#10;1 dåse hakkede tomater&#10;2 fed hvidløg" style="min-height:100px"></textarea>
+      </div>
+      <div>
+        <label class="edit-label">Fremgangsmåde</label>
+        <textarea class="edit-textarea" id="edit-instructions" placeholder="1. Kog pastaen…&#10;2. Svits løg og hvidløg…" style="min-height:120px"></textarea>
+      </div>
+    </div>
+    <div class="edit-footer hidden" id="edit-footer">
+      <button class="btn-ghost" id="edit-cancel">Annuller</button>
+      <button class="btn" id="edit-save">Gem</button>
     </div>
   </div>
 </div>
@@ -255,16 +230,10 @@
 <div id="toast"></div>
 
 <script>
-const DAY_NAMES = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
-const MONTH_NAMES = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const DAY_NAMES = ['Mandag','Tirsdag','Onsdag','Torsdag','Fredag','Lørdag','Søndag'];
+const MONTH_NAMES = ['jan','feb','mar','apr','maj','jun','jul','aug','sep','okt','nov','dec'];
 
-let state = {
-  plan: {},
-  weekOffset: 0,
-  generating: false,
-  sending: false,
-};
-
+let state = { plan: {}, weekOffset: 0, generating: false, sending: false };
 let editTarget = null; // { date, mealType }
 
 // ── Date helpers ── //
@@ -275,24 +244,10 @@ function getMonday(d) {
   mon.setHours(0,0,0,0);
   return mon;
 }
-
-function addDays(d, n) {
-  const r = new Date(d);
-  r.setDate(r.getDate() + n);
-  return r;
-}
-
-function isoDate(d) {
-  return d.toISOString().slice(0,10);
-}
-
-function todayISO() {
-  return isoDate(new Date());
-}
-
-function formatDayDate(d) {
-  return `${d.getDate()} ${MONTH_NAMES[d.getMonth()]}`;
-}
+function addDays(d, n) { const r = new Date(d); r.setDate(r.getDate() + n); return r; }
+function isoDate(d) { return d.toISOString().slice(0,10); }
+function todayISO() { return isoDate(new Date()); }
+function formatDayDate(d) { return `${d.getDate()}. ${MONTH_NAMES[d.getMonth()]}`; }
 
 // ── Load plan ── //
 async function loadPlan() {
@@ -307,11 +262,9 @@ function renderGrid() {
   const grid = document.getElementById('meal-grid');
   const today = todayISO();
   const thisMonday = getMonday(new Date());
-  const weekStart = new Date(thisMonday);
-  weekStart.setDate(thisMonday.getDate() + state.weekOffset * 7);
+  const weekStart = addDays(thisMonday, state.weekOffset * 7);
 
   grid.innerHTML = '';
-
   for (let i = 0; i < 7; i++) {
     const d = addDays(weekStart, i);
     const key = isoDate(d);
@@ -320,29 +273,25 @@ function renderGrid() {
     const col = document.createElement('div');
     col.className = 'day-col';
 
-    // Day header
     const header = document.createElement('div');
     header.className = `day-header${isToday ? ' today' : ''}`;
     header.innerHTML = `<div class="day-name">${DAY_NAMES[i]}</div><div class="day-date">${formatDayDate(d)}</div>`;
     col.appendChild(header);
 
-    // Lunch card
-    col.appendChild(makeMealCard(key, 'lunch', d));
-    // Dinner card
-    col.appendChild(makeMealCard(key, 'dinner', d));
-
+    col.appendChild(makeMealCard(key, 'vegetarian'));
+    col.appendChild(makeMealCard(key, 'kids'));
     grid.appendChild(col);
   }
 }
 
-function makeMealCard(dateKey, mealType, d) {
+function makeMealCard(dateKey, mealType) {
   const card = document.createElement('div');
   card.className = 'meal-card';
 
   const mealData = state.plan[dateKey]?.[mealType];
   const label = document.createElement('div');
   label.className = `meal-label ${mealType}`;
-  label.textContent = mealType.charAt(0).toUpperCase() + mealType.slice(1);
+  label.textContent = mealType === 'vegetarian' ? 'Vegetarret' : 'Børneret';
   card.appendChild(label);
 
   if (mealData && mealData.name) {
@@ -351,44 +300,82 @@ function makeMealCard(dateKey, mealType, d) {
     name.textContent = mealData.name;
     card.appendChild(name);
 
-    if (mealData.description) {
-      const desc = document.createElement('div');
-      desc.className = 'meal-desc';
-      desc.textContent = mealData.description;
-      card.appendChild(desc);
+    const hasRecipe = mealData.ingredients?.length > 0 || mealData.instructions;
+    if (hasRecipe) {
+      const hint = document.createElement('div');
+      hint.className = 'meal-has-recipe';
+      hint.textContent = '📖 Se opskrift';
+      card.appendChild(hint);
     }
   } else {
     const empty = document.createElement('div');
     empty.className = 'meal-empty';
-    empty.textContent = 'No meal planned';
+    empty.textContent = 'Ingen ret planlagt';
     card.appendChild(empty);
   }
 
-  const editBtn = document.createElement('button');
-  editBtn.className = 'meal-edit-btn';
-  editBtn.textContent = '✎';
-  editBtn.title = 'Edit meal';
-  editBtn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    openEditModal(dateKey, mealType, mealData);
-  });
-  card.appendChild(editBtn);
-
-  card.addEventListener('click', () => openEditModal(dateKey, mealType, mealData));
+  card.addEventListener('click', () => openModal(dateKey, mealType));
   return card;
 }
 
-// ── Edit modal ── //
-function openEditModal(dateKey, mealType, mealData) {
+// ── Modal ── //
+function openModal(dateKey, mealType) {
   editTarget = { date: dateKey, mealType };
   const d = new Date(dateKey + 'T00:00:00');
   const dayName = DAY_NAMES[d.getDay() === 0 ? 6 : d.getDay() - 1];
-  document.getElementById('modal-title').textContent =
-    `${dayName} · ${mealType.charAt(0).toUpperCase() + mealType.slice(1)}`;
-  document.getElementById('modal-name').value = mealData?.name || '';
-  document.getElementById('modal-desc').value = mealData?.description || '';
+  const typeLabel = mealType === 'vegetarian' ? 'Vegetarret' : 'Børneret';
+
+  document.getElementById('modal-meta').textContent = `${dayName} ${formatDayDate(d)}`;
+  const mealData = state.plan[dateKey]?.[mealType];
+
+  showViewMode(mealData, typeLabel);
   document.getElementById('modal-overlay').classList.remove('hidden');
-  document.getElementById('modal-name').focus();
+}
+
+function showViewMode(mealData, typeLabel) {
+  document.getElementById('modal-title').textContent = mealData?.name || typeLabel;
+  document.getElementById('recipe-description').textContent = mealData?.description || '';
+
+  const ingredientsList = document.getElementById('ingredients-list');
+  ingredientsList.innerHTML = '';
+  const ingredients = mealData?.ingredients || [];
+  if (ingredients.length > 0) {
+    ingredients.forEach(ing => {
+      const li = document.createElement('li');
+      li.textContent = ing;
+      ingredientsList.appendChild(li);
+    });
+    document.getElementById('ingredients-section').style.display = '';
+  } else {
+    document.getElementById('ingredients-section').style.display = mealData ? 'none' : '';
+  }
+
+  const instructions = mealData?.instructions || '';
+  document.getElementById('instructions-text').textContent = instructions;
+  document.getElementById('instructions-section').style.display = instructions ? '' : 'none';
+
+  if (!mealData || !mealData.name) {
+    document.getElementById('recipe-description').textContent = 'Ingen ret planlagt endnu. Klik Rediger for at tilføje manuelt, eller brug Generer uge.';
+  }
+
+  document.getElementById('modal-body').classList.remove('hidden');
+  document.getElementById('modal-footer').classList.remove('hidden');
+  document.getElementById('edit-mode').classList.remove('active');
+  document.getElementById('edit-footer').classList.add('hidden');
+}
+
+function showEditMode() {
+  const mealData = state.plan[editTarget.date]?.[editTarget.mealType];
+  document.getElementById('edit-name').value = mealData?.name || '';
+  document.getElementById('edit-description').value = mealData?.description || '';
+  document.getElementById('edit-ingredients').value = (mealData?.ingredients || []).join('\n');
+  document.getElementById('edit-instructions').value = mealData?.instructions || '';
+
+  document.getElementById('modal-body').classList.add('hidden');
+  document.getElementById('modal-footer').classList.add('hidden');
+  document.getElementById('edit-mode').classList.add('active');
+  document.getElementById('edit-footer').classList.remove('hidden');
+  document.getElementById('edit-name').focus();
 }
 
 function closeModal() {
@@ -396,37 +383,49 @@ function closeModal() {
   editTarget = null;
 }
 
-document.getElementById('modal-cancel').addEventListener('click', closeModal);
+document.getElementById('modal-close').addEventListener('click', closeModal);
+document.getElementById('modal-close-btn').addEventListener('click', closeModal);
 document.getElementById('modal-overlay').addEventListener('click', (e) => {
   if (e.target === document.getElementById('modal-overlay')) closeModal();
 });
+document.getElementById('modal-edit-btn').addEventListener('click', showEditMode);
+document.getElementById('edit-cancel').addEventListener('click', () => {
+  const mealData = state.plan[editTarget?.date]?.[editTarget?.mealType];
+  const typeLabel = editTarget?.mealType === 'vegetarian' ? 'Vegetarret' : 'Børneret';
+  showViewMode(mealData, typeLabel);
+});
 
-document.getElementById('modal-save').addEventListener('click', async () => {
+document.getElementById('edit-save').addEventListener('click', async () => {
   if (!editTarget) return;
-  const name = document.getElementById('modal-name').value.trim();
-  if (!name) { showToast('Please enter a meal name'); return; }
-  const desc = document.getElementById('modal-desc').value.trim();
+  const name = document.getElementById('edit-name').value.trim();
+  if (!name) { showToast('Angiv venligst et navn på retten'); return; }
+  const description = document.getElementById('edit-description').value.trim();
+  const ingredients = document.getElementById('edit-ingredients').value.split('\n').map(s => s.trim()).filter(Boolean);
+  const instructions = document.getElementById('edit-instructions').value.trim();
+
   await fetch('api/meal', {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ date: editTarget.date, meal_type: editTarget.mealType, name, description: desc }),
+    body: JSON.stringify({ date: editTarget.date, meal_type: editTarget.mealType, name, description, ingredients, instructions }),
   });
+
   if (!state.plan[editTarget.date]) state.plan[editTarget.date] = {};
-  state.plan[editTarget.date][editTarget.mealType] = { name, description: desc };
+  state.plan[editTarget.date][editTarget.mealType] = { name, description, ingredients, instructions };
   renderGrid();
-  closeModal();
-  showToast('Meal updated');
+
+  const typeLabel = editTarget.mealType === 'vegetarian' ? 'Vegetarret' : 'Børneret';
+  document.getElementById('modal-title').textContent = name;
+  showViewMode(state.plan[editTarget.date][editTarget.mealType], typeLabel);
+  showToast('Ret opdateret');
 });
 
 document.getElementById('modal-delete').addEventListener('click', async () => {
   if (!editTarget) return;
   await fetch(`api/meal?date_str=${editTarget.date}&meal_type=${editTarget.mealType}`, { method: 'DELETE' });
-  if (state.plan[editTarget.date]) {
-    state.plan[editTarget.date][editTarget.mealType] = null;
-  }
+  if (state.plan[editTarget.date]) state.plan[editTarget.date][editTarget.mealType] = null;
   renderGrid();
   closeModal();
-  showToast('Meal cleared');
+  showToast('Ret ryddet');
 });
 
 // ── Week tabs ── //
@@ -439,7 +438,7 @@ document.querySelectorAll('.tab').forEach(tab => {
   });
 });
 
-// ── Generate week ── //
+// ── Generate ── //
 document.getElementById('generate-btn').addEventListener('click', async () => {
   if (state.generating) return;
   state.generating = true;
@@ -456,19 +455,19 @@ document.getElementById('generate-btn').addEventListener('click', async () => {
     if (!res.ok) {
       let detail = `HTTP ${res.status}`;
       try { const err = await res.json(); detail = err.detail || detail; } catch (_) { detail = await res.text().catch(() => detail); }
-      showToast(`Error: ${detail}`);
+      showToast(`Fejl: ${detail}`);
       return;
     }
     const weekPlan = await res.json();
     Object.assign(state.plan, weekPlan);
     renderGrid();
-    showToast('Meal plan generated!');
+    showToast('Madplan genereret!');
   } catch (e) {
-    showToast('Generation failed — check API key');
+    showToast(`Fejl: ${e.message}`);
   } finally {
     state.generating = false;
     btn.disabled = false;
-    btn.textContent = 'Generate week';
+    btn.textContent = 'Generer uge';
   }
 });
 
@@ -477,8 +476,7 @@ document.getElementById('chat-toggle').addEventListener('click', () => {
   const panel = document.getElementById('chat-panel');
   panel.classList.toggle('open');
   if (panel.classList.contains('open')) {
-    const msgs = document.getElementById('chat-messages');
-    msgs.scrollTop = msgs.scrollHeight;
+    document.getElementById('chat-messages').scrollTop = document.getElementById('chat-messages').scrollHeight;
     document.getElementById('chat-input').focus();
   }
 });
@@ -513,8 +511,6 @@ async function sendChat() {
   sendBtn.innerHTML = '<span class="spinner"></span>';
   input.value = '';
   input.style.height = '38px';
-
-  // Ensure chat is open
   document.getElementById('chat-panel').classList.add('open');
   appendMessage('user', message);
 
@@ -527,18 +523,15 @@ async function sendChat() {
     if (!res.ok) {
       let detail = `HTTP ${res.status}`;
       try { const err = await res.json(); detail = err.detail || detail; } catch (_) { detail = await res.text().catch(() => detail); }
-      appendMessage('assistant', `Error: ${detail}`);
+      appendMessage('assistant', `Fejl: ${detail}`);
       return;
     }
     const data = await res.json();
     appendMessage('assistant', data.reply);
-    if (data.plan) {
-      Object.assign(state.plan, data.plan);
-      renderGrid();
-    }
+    if (data.plan) { Object.assign(state.plan, data.plan); renderGrid(); }
   } catch (e) {
-    console.error('Chat error:', e);
-    appendMessage('assistant', `Failed to reach the assistant: ${e.message}`);
+    console.error('Chat fejl:', e);
+    appendMessage('assistant', `Kunne ikke nå assistenten: ${e.message}`);
   } finally {
     state.sending = false;
     sendBtn.disabled = false;
@@ -549,22 +542,13 @@ async function sendChat() {
 
 document.getElementById('send-btn').addEventListener('click', sendChat);
 document.getElementById('chat-input').addEventListener('keydown', (e) => {
-  if (e.key === 'Enter' && !e.shiftKey) {
-    e.preventDefault();
-    sendChat();
-  }
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendChat(); }
 });
-
-// Auto-resize textarea
 document.getElementById('chat-input').addEventListener('input', function() {
   this.style.height = '38px';
   this.style.height = Math.min(this.scrollHeight, 120) + 'px';
 });
-
-// Keyboard: Escape closes modal
-document.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape') closeModal();
-});
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
 
 // ── Toast ── //
 let toastTimer = null;
