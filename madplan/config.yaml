@@ -22,9 +22,9 @@ ports_description:
 
 options:
   openai_api_key: ""
-  chat_model: "gpt-4.1"
+  chat_model: "gpt-5.5"
   num_adults: 2
-  num_children: 2
+  num_children: 3
 
 schema:
   openai_api_key: str
