@@ -67,11 +67,14 @@ def monday_of_week(d: date) -> date:
 
 def make_agent() -> MealPlanAgent:
     opts = load_options()
+    api_key = opts.get("openai_api_key", "").strip()
+    if not api_key:
+        raise HTTPException(status_code=400, detail="OpenAI API key is not configured. Set it in the add-on configuration.")
     return MealPlanAgent(
-        api_key=opts["openai_api_key"],
-        model=opts.get("chat_model", "gpt-4.1"),
+        api_key=api_key,
+        model=opts.get("chat_model", "gpt-5.5"),
         num_adults=opts.get("num_adults", 2),
-        num_children=opts.get("num_children", 2),
+        num_children=opts.get("num_children", 3),
     )
 
 
@@ -111,10 +114,12 @@ def get_plan():
 async def generate_week(req: GenerateRequest):
     today = date.today()
     week_start = monday_of_week(today) + timedelta(weeks=req.week_offset)
-    agent = make_agent()
     plan = load_meal_plan()
     try:
+        agent = make_agent()
         updated = agent.generate_week(week_start, plan)
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
     save_meal_plan(updated)
@@ -132,9 +137,11 @@ async def chat(req: ChatRequest):
     week_start = monday_of_week(today)
     plan = load_meal_plan()
     history = load_chat_history()
-    agent = make_agent()
     try:
+        agent = make_agent()
         reply, updated_plan = agent.chat(req.message, plan, history, week_start)
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
     save_meal_plan(updated_plan)

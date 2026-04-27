@@ -454,8 +454,9 @@ document.getElementById('generate-btn').addEventListener('click', async () => {
       body: JSON.stringify({ week_offset: state.weekOffset }),
     });
     if (!res.ok) {
-      const err = await res.json();
-      showToast(`Error: ${err.detail || 'Generation failed'}`);
+      let detail = `HTTP ${res.status}`;
+      try { const err = await res.json(); detail = err.detail || detail; } catch (_) { detail = await res.text().catch(() => detail); }
+      showToast(`Error: ${detail}`);
       return;
     }
     const weekPlan = await res.json();
@@ -524,8 +525,9 @@ async function sendChat() {
       body: JSON.stringify({ message, week_offset: state.weekOffset }),
     });
     if (!res.ok) {
-      const err = await res.json();
-      appendMessage('assistant', `Error: ${err.detail || 'Something went wrong'}`);
+      let detail = `HTTP ${res.status}`;
+      try { const err = await res.json(); detail = err.detail || detail; } catch (_) { detail = await res.text().catch(() => detail); }
+      appendMessage('assistant', `Error: ${detail}`);
       return;
     }
     const data = await res.json();
@@ -535,7 +537,8 @@ async function sendChat() {
       renderGrid();
     }
   } catch (e) {
-    appendMessage('assistant', 'Failed to reach assistant — check your API key.');
+    console.error('Chat error:', e);
+    appendMessage('assistant', `Failed to reach the assistant: ${e.message}`);
   } finally {
     state.sending = false;
     sendBtn.disabled = false;
