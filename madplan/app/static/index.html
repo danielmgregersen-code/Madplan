@@ -129,6 +129,14 @@
   .spinner { display: inline-block; width: 12px; height: 12px; border: 2px solid rgba(74,240,160,0.3); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.6s linear infinite; }
   @keyframes spin { to { transform: rotate(360deg); } }
 
+  /* ── Thinking indicator ── */
+  .thinking { display: flex; align-items: center; gap: 8px; padding: 6px 12px; font-size: 11px; color: var(--muted); align-self: flex-start; }
+  .dots { display: flex; gap: 3px; }
+  .dots span { width: 5px; height: 5px; background: var(--accent); border-radius: 50%; animation: bounce 1.2s ease-in-out infinite; }
+  .dots span:nth-child(2) { animation-delay: 0.2s; }
+  .dots span:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes bounce { 0%,80%,100% { transform: scale(0.6); opacity:0.4; } 40% { transform: scale(1); opacity:1; } }
+
   /* ── Toast ── */
   #toast { position: fixed; bottom: 60px; left: 50%; transform: translateX(-50%); background: var(--surface); border: 1px solid var(--accent); color: var(--text); font-size: 12px; padding: 8px 16px; border-radius: 8px; z-index: 200; opacity: 0; transition: opacity 0.2s; pointer-events: none; }
   #toast.show { opacity: 1; }
@@ -438,6 +446,51 @@ document.querySelectorAll('.tab').forEach(tab => {
   });
 });
 
+// ── Polling helpers ── //
+
+// After the ingress proxy kills a long /api/generate connection the backend
+// keeps running and saves the result. Poll /api/plan until new meals appear.
+async function pollForGeneratedPlan(weekOffset, baselineNames, maxSeconds = 180, intervalMs = 5000) {
+  const deadline = Date.now() + maxSeconds * 1000;
+  const thisMonday = getMonday(new Date());
+  const weekStart = addDays(thisMonday, weekOffset * 7);
+  while (Date.now() < deadline) {
+    await new Promise(r => setTimeout(r, intervalMs));
+    try {
+      const res = await fetch('api/plan');
+      if (!res.ok) continue;
+      const plan = await res.json();
+      let newlyFilled = 0;
+      for (let i = 0; i < 7; i++) {
+        const key = isoDate(addDays(weekStart, i));
+        const name = plan[key]?.vegetarian?.name || plan[key]?.kids?.name;
+        if (name && name !== baselineNames[key]) newlyFilled++;
+      }
+      if (newlyFilled >= 4) return plan;
+    } catch {}
+  }
+  return null;
+}
+
+// After the ingress proxy kills a long /api/chat connection the backend keeps
+// running and persists the reply. Poll /api/chat-history to recover it.
+async function pollForChatReply(baseline, maxSeconds = 180, intervalMs = 5000) {
+  const deadline = Date.now() + maxSeconds * 1000;
+  while (Date.now() < deadline) {
+    await new Promise(r => setTimeout(r, intervalMs));
+    try {
+      const res = await fetch('api/chat-history');
+      if (!res.ok) continue;
+      const history = await res.json();
+      const last = history[history.length - 1];
+      if (history.length >= baseline + 2 && last?.role === 'assistant' && last.content) {
+        return last.content;
+      }
+    } catch {}
+  }
+  return null;
+}
+
 // ── Generate ── //
 document.getElementById('generate-btn').addEventListener('click', async () => {
   if (state.generating) return;
@@ -445,6 +498,15 @@ document.getElementById('generate-btn').addEventListener('click', async () => {
   const btn = document.getElementById('generate-btn');
   btn.disabled = true;
   btn.innerHTML = '<span class="spinner"></span>';
+
+  // Snapshot current week so we can detect new meals after a connection drop
+  const thisMonday = getMonday(new Date());
+  const weekStart = addDays(thisMonday, state.weekOffset * 7);
+  const baselineNames = {};
+  for (let i = 0; i < 7; i++) {
+    const key = isoDate(addDays(weekStart, i));
+    baselineNames[key] = state.plan[key]?.vegetarian?.name || state.plan[key]?.kids?.name || null;
+  }
 
   try {
     const res = await fetch('api/generate', {
@@ -463,6 +525,15 @@ document.getElementById('generate-btn').addEventListener('click', async () => {
     renderGrid();
     showToast('Madplan genereret!');
   } catch (e) {
+    if (e instanceof TypeError) {
+      const plan = await pollForGeneratedPlan(state.weekOffset, baselineNames);
+      if (plan) {
+        Object.assign(state.plan, plan);
+        renderGrid();
+        showToast('Madplan genereret!');
+        return;
+      }
+    }
     showToast(`Fejl: ${e.message}`);
   } finally {
     state.generating = false;
@@ -500,6 +571,16 @@ function appendMessage(role, content, scroll = true) {
   if (scroll) container.scrollTop = container.scrollHeight;
 }
 
+function showThinking() {
+  const el = document.createElement('div');
+  el.className = 'thinking'; el.id = 'thinking';
+  el.innerHTML = '<div class="dots"><span></span><span></span><span></span></div><span>Assistenten tænker…</span>';
+  const container = document.getElementById('chat-messages');
+  container.appendChild(el);
+  container.scrollTop = container.scrollHeight;
+}
+function hideThinking() { document.getElementById('thinking')?.remove(); }
+
 async function sendChat() {
   const input = document.getElementById('chat-input');
   const message = input.value.trim();
@@ -513,6 +594,14 @@ async function sendChat() {
   input.style.height = '38px';
   document.getElementById('chat-panel').classList.add('open');
   appendMessage('user', message);
+  showThinking();
+
+  // Snapshot history length so we can recover the reply after a connection drop
+  let historyBaseline = null;
+  try {
+    const r = await fetch('api/chat-history');
+    if (r.ok) historyBaseline = (await r.json()).length;
+  } catch {}
 
   try {
     const res = await fetch('api/chat', {
@@ -523,15 +612,27 @@ async function sendChat() {
     if (!res.ok) {
       let detail = `HTTP ${res.status}`;
       try { const err = await res.json(); detail = err.detail || detail; } catch (_) { detail = await res.text().catch(() => detail); }
-      appendMessage('assistant', `Fejl: ${detail}`);
+      hideThinking(); appendMessage('assistant', `Fejl: ${detail}`);
       return;
     }
     const data = await res.json();
-    appendMessage('assistant', data.reply);
+    hideThinking(); appendMessage('assistant', data.reply);
     if (data.plan) { Object.assign(state.plan, data.plan); renderGrid(); }
   } catch (e) {
+    if (e instanceof TypeError && historyBaseline !== null) {
+      const reply = await pollForChatReply(historyBaseline);
+      if (reply) {
+        hideThinking(); appendMessage('assistant', reply);
+        try {
+          const r = await fetch('api/plan');
+          if (r.ok) { Object.assign(state.plan, await r.json()); renderGrid(); }
+        } catch {}
+        return;
+      }
+    }
+    hideThinking();
     console.error('Chat fejl:', e);
-    appendMessage('assistant', `Kunne ikke nå assistenten: ${e.message}`);
+    appendMessage('assistant', `⚠ Fejl: ${e.message}`);
   } finally {
     state.sending = false;
     sendBtn.disabled = false;
