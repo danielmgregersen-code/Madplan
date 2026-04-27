@@ -89,9 +89,15 @@
   .modal { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); width: 100%; max-width: 520px; max-height: 90dvh; display: flex; flex-direction: column; overflow: hidden; }
 
   .modal-header { padding: 16px 20px 12px; border-bottom: 1px solid var(--border); flex-shrink: 0; display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
-  .modal-header-text {}
+  .modal-header-text { flex: 1; min-width: 0; }
   .modal-meta { font-size: 10px; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 4px; }
   .modal-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 16px; }
+  .modal-title-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 8px; }
+  .time-badge { display: inline-flex; align-items: center; gap: 4px; background: var(--surface2); border: 1px solid var(--border); border-radius: 6px; padding: 3px 8px; font-size: 11px; color: var(--accent2); flex-shrink: 0; }
+  .servings-row { display: flex; align-items: center; gap: 8px; font-size: 11px; color: var(--muted); }
+  .servings-btn { background: var(--surface2); border: 1px solid var(--border); color: var(--text); width: 24px; height: 24px; border-radius: 6px; cursor: pointer; font-size: 14px; line-height: 1; display: flex; align-items: center; justify-content: center; transition: border-color 0.15s; }
+  .servings-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .servings-count { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 13px; color: var(--text); min-width: 18px; text-align: center; }
   .modal-close { background: none; border: none; color: var(--muted); font-size: 20px; cursor: pointer; line-height: 1; padding: 2px; flex-shrink: 0; }
   .modal-close:hover { color: var(--text); }
 
@@ -186,7 +192,16 @@
     <div class="modal-header">
       <div class="modal-header-text">
         <div class="modal-meta" id="modal-meta"></div>
-        <div class="modal-title" id="modal-title"></div>
+        <div class="modal-title-row">
+          <div class="modal-title" id="modal-title"></div>
+          <div class="time-badge" id="time-badge" style="display:none">⏱ <span id="time-value"></span></div>
+        </div>
+        <div class="servings-row" id="servings-row" style="display:none">
+          <span>Portioner:</span>
+          <button class="servings-btn" id="servings-dec">−</button>
+          <span class="servings-count" id="servings-count"></span>
+          <button class="servings-btn" id="servings-inc">+</button>
+        </div>
       </div>
       <button class="modal-close" id="modal-close">✕</button>
     </div>
@@ -218,6 +233,16 @@
       <div>
         <label class="edit-label">Kort beskrivelse</label>
         <input type="text" class="edit-input" id="edit-description" placeholder="Kort beskrivelse…">
+      </div>
+      <div style="display:flex;gap:10px">
+        <div style="flex:1">
+          <label class="edit-label">Tilberedningstid</label>
+          <input type="text" class="edit-input" id="edit-total-time" placeholder="fx 30 min">
+        </div>
+        <div style="width:100px">
+          <label class="edit-label">Portioner</label>
+          <input type="number" class="edit-input" id="edit-servings" min="1" max="20" placeholder="5">
+        </div>
       </div>
       <div>
         <label class="edit-label">Ingredienser (én per linje, med mængder)</label>
@@ -326,7 +351,24 @@ function makeMealCard(dateKey, mealType) {
   return card;
 }
 
+// ── Ingredient scaling ── //
+// Scale all leading numbers in an ingredient string by ratio, rounding sensibly.
+function scaleIngredient(ingredient, ratio) {
+  if (ratio === 1) return ingredient;
+  return ingredient.replace(/\b(\d+(?:[.,]\d+)?)/g, (match, num) => {
+    const val = parseFloat(num.replace(',', '.')) * ratio;
+    if (val >= 100) return Math.round(val).toString();
+    if (val >= 10)  return (Math.round(val * 2) / 2).toString().replace('.', ',');
+    if (val >= 1)   return (Math.round(val * 4) / 4).toString().replace('.', ',');
+    return (Math.round(val * 8) / 8).toString().replace('.', ',');
+  });
+}
+
 // ── Modal ── //
+let modalServings = 0;      // currently displayed serving count
+let modalBaseServings = 0;  // original servings the recipe was made for
+let modalBaseIngredients = []; // original (unscaled) ingredients
+
 function openModal(dateKey, mealType) {
   editTarget = { date: dateKey, mealType };
   const d = new Date(dateKey + 'T00:00:00');
@@ -340,19 +382,47 @@ function openModal(dateKey, mealType) {
   document.getElementById('modal-overlay').classList.remove('hidden');
 }
 
+function renderIngredients(ingredients, ratio) {
+  const list = document.getElementById('ingredients-list');
+  list.innerHTML = '';
+  ingredients.forEach(ing => {
+    const li = document.createElement('li');
+    li.textContent = scaleIngredient(ing, ratio);
+    list.appendChild(li);
+  });
+}
+
 function showViewMode(mealData, typeLabel) {
   document.getElementById('modal-title').textContent = mealData?.name || typeLabel;
   document.getElementById('recipe-description').textContent = mealData?.description || '';
 
-  const ingredientsList = document.getElementById('ingredients-list');
-  ingredientsList.innerHTML = '';
-  const ingredients = mealData?.ingredients || [];
-  if (ingredients.length > 0) {
-    ingredients.forEach(ing => {
-      const li = document.createElement('li');
-      li.textContent = ing;
-      ingredientsList.appendChild(li);
-    });
+  // Time badge
+  const timeBadge = document.getElementById('time-badge');
+  const timeVal = mealData?.total_time || '';
+  if (timeVal) {
+    document.getElementById('time-value').textContent = timeVal;
+    timeBadge.style.display = '';
+  } else {
+    timeBadge.style.display = 'none';
+  }
+
+  // Servings
+  modalBaseIngredients = mealData?.ingredients || [];
+  modalBaseServings = mealData?.servings || 0;
+  modalServings = modalBaseServings || 0;
+
+  const servingsRow = document.getElementById('servings-row');
+  if (modalBaseServings > 0) {
+    document.getElementById('servings-count').textContent = modalServings;
+    servingsRow.style.display = '';
+  } else {
+    servingsRow.style.display = 'none';
+  }
+
+  // Ingredients
+  const ratio = (modalBaseServings > 0 && modalServings > 0) ? modalServings / modalBaseServings : 1;
+  if (modalBaseIngredients.length > 0) {
+    renderIngredients(modalBaseIngredients, ratio);
     document.getElementById('ingredients-section').style.display = '';
   } else {
     document.getElementById('ingredients-section').style.display = mealData ? 'none' : '';
@@ -376,6 +446,8 @@ function showEditMode() {
   const mealData = state.plan[editTarget.date]?.[editTarget.mealType];
   document.getElementById('edit-name').value = mealData?.name || '';
   document.getElementById('edit-description').value = mealData?.description || '';
+  document.getElementById('edit-total-time').value = mealData?.total_time || '';
+  document.getElementById('edit-servings').value = mealData?.servings || '';
   document.getElementById('edit-ingredients').value = (mealData?.ingredients || []).join('\n');
   document.getElementById('edit-instructions').value = mealData?.instructions || '';
 
@@ -385,6 +457,21 @@ function showEditMode() {
   document.getElementById('edit-footer').classList.remove('hidden');
   document.getElementById('edit-name').focus();
 }
+
+// Servings +/- buttons
+document.getElementById('servings-dec').addEventListener('click', () => {
+  if (modalServings <= 1) return;
+  modalServings--;
+  document.getElementById('servings-count').textContent = modalServings;
+  const ratio = modalBaseServings > 0 ? modalServings / modalBaseServings : 1;
+  renderIngredients(modalBaseIngredients, ratio);
+});
+document.getElementById('servings-inc').addEventListener('click', () => {
+  modalServings++;
+  document.getElementById('servings-count').textContent = modalServings;
+  const ratio = modalBaseServings > 0 ? modalServings / modalBaseServings : 1;
+  renderIngredients(modalBaseIngredients, ratio);
+});
 
 function closeModal() {
   document.getElementById('modal-overlay').classList.add('hidden');
@@ -408,17 +495,19 @@ document.getElementById('edit-save').addEventListener('click', async () => {
   const name = document.getElementById('edit-name').value.trim();
   if (!name) { showToast('Angiv venligst et navn på retten'); return; }
   const description = document.getElementById('edit-description').value.trim();
+  const total_time = document.getElementById('edit-total-time').value.trim();
+  const servings = parseInt(document.getElementById('edit-servings').value) || 0;
   const ingredients = document.getElementById('edit-ingredients').value.split('\n').map(s => s.trim()).filter(Boolean);
   const instructions = document.getElementById('edit-instructions').value.trim();
 
   await fetch('api/meal', {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ date: editTarget.date, meal_type: editTarget.mealType, name, description, ingredients, instructions }),
+    body: JSON.stringify({ date: editTarget.date, meal_type: editTarget.mealType, name, description, total_time, servings, ingredients, instructions }),
   });
 
   if (!state.plan[editTarget.date]) state.plan[editTarget.date] = {};
-  state.plan[editTarget.date][editTarget.mealType] = { name, description, ingredients, instructions };
+  state.plan[editTarget.date][editTarget.mealType] = { name, description, total_time, servings, ingredients, instructions };
   renderGrid();
 
   const typeLabel = editTarget.mealType === 'vegetarian' ? 'Vegetarret' : 'Børneret';

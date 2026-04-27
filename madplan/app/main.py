@@ -100,6 +100,8 @@ class UpdateMealRequest(BaseModel):
     meal_type: str          # "vegetarian" or "kids"
     name: str
     description: str = ""
+    total_time: str = ""
+    servings: int = 0
     ingredients: List[str] = []
     instructions: str = ""
 
@@ -170,6 +172,8 @@ async def update_meal(req: UpdateMealRequest):
     plan[req.date][req.meal_type] = {
         "name": req.name,
         "description": req.description,
+        "total_time": req.total_time,
+        "servings": req.servings,
         "ingredients": req.ingredients,
         "instructions": req.instructions,
     }

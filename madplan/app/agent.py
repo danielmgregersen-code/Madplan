@@ -33,17 +33,25 @@ TOOL_UPDATE_MEALS = {
                                 "type": "string",
                                 "description": "Kort beskrivelse af retten på én linje"
                             },
+                            "total_time": {
+                                "type": "string",
+                                "description": "Realistisk samlet tilberedningstid inkl. forberedelse, fx '25 min', '45 min', '1 time 10 min'"
+                            },
+                            "servings": {
+                                "type": "integer",
+                                "description": "Antal personer opskriften er beregnet til"
+                            },
                             "ingredients": {
                                 "type": "array",
                                 "items": {"type": "string"},
-                                "description": "Ingrediensliste med mængder, fx ['200g fusilli', '1 dåse hakkede tomater']"
+                                "description": "Ingrediensliste med præcise mængder, fx ['200g fusilli', '1 dåse hakkede tomater', '2 fed hvidløg']"
                             },
                             "instructions": {
                                 "type": "string",
                                 "description": "Nummererede tilberedningstrin adskilt af linjeskift, fx '1. Kog pasta...\n2. Svits løg...'"
                             }
                         },
-                        "required": ["date", "meal_type", "name", "description", "ingredients", "instructions"]
+                        "required": ["date", "meal_type", "name", "description", "total_time", "servings", "ingredients", "instructions"]
                     }
                 }
             },
@@ -68,7 +76,12 @@ Alle retter skal:
 - Have ingredienser med præcise mængder tilpasset {total} personer
 - Have klare, nummererede tilberedningstrin
 - Være varierede hen over ugen – undgå at gentage retter
-- Hverdage: ca. 30 min tilberedningstid. Weekender: gerne lidt mere særlig.
+- Have en realistisk og præcis total_time (inkl. forberedelse og tilberedning):
+  - Enkle hverdagsretter: 20–35 min
+  - Mellemstore retter: 35–55 min
+  - Mere elaborate retter (fx ovnretter, gryderetter): 55–90 min
+  - Weekendretter må gerne tage op til 90 min
+  - Vær præcis — skriv "25 min" ikke "ca. 30 min"
 
 Når brugeren beder om ændringer, brug update_meals-værktøjet til at anvende dem, og bekræft kort hvad du ændrede."""
 
@@ -185,6 +198,8 @@ class MealPlanAgent:
             meal_plan[d][meal_type] = {
                 "name": u.get("name", ""),
                 "description": u.get("description", ""),
+                "total_time": u.get("total_time", ""),
+                "servings": u.get("servings", 0),
                 "ingredients": u.get("ingredients", []),
                 "instructions": u.get("instructions", ""),
             }
