@@ -1,0 +1,36 @@
+name: "Madplan"
+description: "AI-powered vegetarian family meal planner with weekly overview and chat interface."
+version: "1.0.0"
+slug: "madplan"
+init: false
+arch:
+  - aarch64
+  - amd64
+  - armv7
+
+ingress: true
+ingress_port: 8000
+ingress_stream: false
+
+panel_icon: "mdi:food-variant"
+panel_title: "Madplan"
+
+ports:
+  8000/tcp: 8000
+ports_description:
+  8000/tcp: "Madplan Web UI (direct access)"
+
+options:
+  openai_api_key: ""
+  chat_model: "gpt-4.1"
+  num_adults: 2
+  num_children: 2
+
+schema:
+  openai_api_key: str
+  chat_model: str
+  num_adults: int
+  num_children: int
+
+startup: application
+boot: auto
