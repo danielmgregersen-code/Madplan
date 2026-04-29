@@ -7,8 +7,6 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from typing import List
 from agent import MealPlanAgent
-from salling import fetch_food_waste_offers
-from scraper import fetch_all_store_offers
 
 OPTIONS_FILE = "/data/options.json"
 MEAL_PLAN_FILE = "/data/meal_plan.json"
@@ -262,25 +260,10 @@ async def create_shopping_list(req: ShoppingListRequest):
     except ValueError:
         raise HTTPException(status_code=400, detail="Ugyldig dato — brug YYYY-MM-DD format")
 
-    opts = load_options()
-    salling_key = opts.get("salling_api_key", "").strip()
-    postal_code = opts.get("postal_code", "").strip()
     plan = load_meal_plan()
-
-    salling_offers: list = []
-    if salling_key and postal_code:
-        salling_offers = fetch_food_waste_offers(salling_key, postal_code)
-
-    scraped = fetch_all_store_offers(postal_code)
-    lidl_offers = scraped.get("lidl", [])
-    loevbjerg_offers = scraped.get("loevbjerg", [])
-    rema_offers = scraped.get("rema", [])
-
     try:
         agent = make_agent()
-        stores = agent.generate_shopping_list(
-            start, plan, salling_offers, lidl_offers, loevbjerg_offers, rema_offers
-        )
+        items = agent.generate_shopping_list(start, plan)
     except HTTPException:
         raise
     except Exception as e:
@@ -289,11 +272,7 @@ async def create_shopping_list(req: ShoppingListRequest):
     payload = {
         "start_date": req.start_date,
         "end_date": (start + timedelta(days=6)).isoformat(),
-        "stores": stores,
-        "has_salling_data": bool(salling_offers),
-        "has_lidl_data": bool(lidl_offers),
-        "has_loevbjerg_data": bool(loevbjerg_offers),
-        "has_rema_data": bool(rema_offers),
+        "items": items,
     }
     _save_json(SHOPPING_LIST_FILE, payload)
     return payload

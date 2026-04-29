@@ -148,33 +148,35 @@
   .shopping-sub { font-size: 9px; color: var(--muted); margin-left: auto; }
 
   /* ── Shopping list modal ── */
-  .shop-modal { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); width: 100%; max-width: 560px; max-height: 90dvh; display: flex; flex-direction: column; overflow: hidden; }
-  .shop-header { padding: 14px 18px 10px; border-bottom: 1px solid var(--border); flex-shrink: 0; }
-  .shop-header-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
-  .shop-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 15px; margin-bottom: 4px; }
-  .shop-subtitle { font-size: 10px; color: var(--muted); margin-bottom: 6px; }
-  .shop-badges { display: flex; gap: 5px; flex-wrap: wrap; }
-  .shop-badge { font-size: 9px; padding: 2px 7px; border-radius: 5px; border: 1px solid; }
-  .shop-badge.live { border-color: var(--accent); color: var(--accent); background: rgba(74,240,160,0.08); }
-  .shop-badge.ai { border-color: var(--border); color: var(--muted); }
+  .shop-modal { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); width: 100%; max-width: 580px; max-height: 90dvh; display: flex; flex-direction: column; overflow: hidden; }
+  .shop-header { padding: 14px 18px 10px; border-bottom: 1px solid var(--border); flex-shrink: 0; display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+  .shop-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 15px; margin-bottom: 3px; }
+  .shop-subtitle { font-size: 10px; color: var(--muted); }
 
-  .shop-tabs { display: flex; gap: 3px; padding: 10px 18px 0; flex-shrink: 0; border-bottom: 1px solid var(--border); overflow-x: auto; }
-  .shop-tab { background: none; border: none; border-bottom: 2px solid transparent; color: var(--muted); font-family: 'DM Mono', monospace; font-size: 11px; padding: 6px 10px 8px; cursor: pointer; white-space: nowrap; transition: all 0.15s; }
+  .shop-tabs { display: flex; gap: 0; flex-shrink: 0; border-bottom: 1px solid var(--border); overflow-x: auto; padding: 0 18px; }
+  .shop-tab { background: none; border: none; border-bottom: 2px solid transparent; color: var(--muted); font-family: 'DM Mono', monospace; font-size: 10px; padding: 8px 10px 9px; cursor: pointer; white-space: nowrap; transition: all 0.15s; }
   .shop-tab:hover { color: var(--text); }
   .shop-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
-  .shop-tab .shop-count { font-size: 9px; color: var(--muted); margin-left: 3px; }
-  .shop-tab.active .shop-count { color: var(--accent); }
+  .shop-tab-count { font-size: 9px; color: inherit; opacity: 0.65; margin-left: 3px; }
 
-  .shop-body { flex: 1; overflow-y: auto; padding: 12px 18px; }
+  .shop-body { flex: 1; overflow-y: auto; padding: 10px 18px 14px; }
   .shop-body::-webkit-scrollbar { width: 3px; }
   .shop-body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
   .shop-empty { font-size: 11px; color: var(--muted); font-style: italic; padding: 12px 0; }
-  .shop-item { display: flex; align-items: flex-start; gap: 9px; padding: 6px 0; border-bottom: 1px solid rgba(37,42,58,0.5); }
+
+  .shop-section-label { font-size: 9px; color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase; padding: 10px 0 4px; }
+  .shop-divider { border: none; border-top: 1px dashed var(--border); margin: 4px 0 2px; }
+  .shop-unassigned-label { font-size: 9px; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; padding: 10px 0 4px; opacity: 0.7; }
+
+  .shop-item { display: flex; align-items: center; gap: 9px; padding: 5px 0; border-bottom: 1px solid rgba(37,42,58,0.4); }
   .shop-item:last-child { border-bottom: none; }
-  .shop-checkbox { width: 15px; height: 15px; border: 1px solid var(--border); border-radius: 3px; flex-shrink: 0; margin-top: 2px; cursor: pointer; appearance: none; background: var(--surface2); transition: background 0.15s; }
+  .shop-item.dimmed .shop-item-text { opacity: 0.45; }
+  .shop-checkbox { width: 15px; height: 15px; border: 1px solid var(--border); border-radius: 3px; flex-shrink: 0; cursor: pointer; appearance: none; background: var(--surface2); transition: background 0.15s; }
   .shop-checkbox:checked { background: var(--accent); border-color: var(--accent); }
-  .shop-item-text { font-size: 11px; color: var(--text); line-height: 1.5; flex: 1; }
-  .tilbud-badge { display: inline-block; background: rgba(240,196,74,0.15); border: 1px solid rgba(240,196,74,0.4); color: var(--accent2); font-size: 9px; padding: 1px 5px; border-radius: 4px; margin-left: 5px; white-space: nowrap; }
+  .shop-item-text { font-size: 11px; color: var(--text); line-height: 1.4; flex: 1; transition: opacity 0.15s; }
+  .store-picker { background: var(--surface2); border: 1px solid var(--border); color: var(--muted); font-family: 'DM Mono', monospace; font-size: 10px; padding: 3px 6px; border-radius: 5px; cursor: pointer; outline: none; flex-shrink: 0; max-width: 115px; transition: border-color 0.15s, color 0.15s; }
+  .store-picker:focus { border-color: var(--accent); }
+  .store-picker.assigned { border-color: rgba(74,240,160,0.5); color: var(--accent); }
 
   .shop-footer { padding: 10px 18px; border-top: 1px solid var(--border); display: flex; gap: 7px; justify-content: flex-end; flex-shrink: 0; }
 
@@ -309,22 +311,14 @@
 <div class="modal-overlay hidden" id="shop-overlay">
   <div class="shop-modal">
     <div class="shop-header">
-      <div class="shop-header-row">
-        <div>
-          <div class="shop-title">🛒 Indkøbsliste</div>
-          <div class="shop-subtitle" id="shop-subtitle"></div>
-          <div class="shop-badges" id="shop-badges"></div>
-        </div>
-        <button class="modal-close" id="shop-close">✕</button>
+      <div>
+        <div class="shop-title">🛒 Indkøbsliste</div>
+        <div class="shop-subtitle" id="shop-subtitle"></div>
       </div>
+      <button class="modal-close" id="shop-close">✕</button>
     </div>
     <div class="shop-tabs" id="shop-tabs"></div>
-    <div class="shop-body" id="shop-body">
-      <div class="thinking" id="shop-thinking" style="padding:16px 0">
-        <div class="dots"><span></span><span></span><span></span></div>
-        <span>Henter tilbud og laver indkøbsliste…</span>
-      </div>
-    </div>
+    <div class="shop-body" id="shop-body"></div>
     <div class="shop-footer">
       <button class="btn-ghost" id="shop-regenerate">Generer igen</button>
       <button class="btn" id="shop-close-btn">Luk</button>
@@ -861,19 +855,29 @@ function showToast(msg) {
 }
 
 // ── Shopping list ── //
-const STORE_META = {
-  foetex:    { label: 'Føtex',    emoji: '🟢' },
-  loevbjerg: { label: 'Løvbjerg', emoji: '🔵' },
-  netto:     { label: 'Netto',    emoji: '🟡' },
-  lidl:      { label: 'Lidl',     emoji: '🟠' },
-  rema:      { label: 'Rema 1000',emoji: '🔴' },
-  other:     { label: 'Generelt', emoji: '⚪' },
-};
-const STORE_ORDER = ['foetex', 'loevbjerg', 'netto', 'lidl', 'rema', 'other'];
+const STORES = [
+  { key: 'rema',      label: 'Rema 1000' },
+  { key: 'foetex',   label: 'Føtex' },
+  { key: 'netto',    label: 'Netto' },
+  { key: 'loevbjerg',label: 'Løvbjerg' },
+  { key: 'lidl',     label: 'Lidl' },
+];
+const STORE_KEYS = STORES.map(s => s.key);
 
 let shopCurrentDate = null;
-let shopActiveTab = 'foetex';
-let shopData = null;
+let shopActiveTab = 'all'; // 'all' | store key
+let shopItems = [];        // flat list of item strings from backend
+let shopChecked = {};      // { item: bool }
+
+// Assignments persisted in localStorage: { startDate: { item: storeKey } }
+function getAssignments(startDate) {
+  try { return JSON.parse(localStorage.getItem(`msp_${startDate}`) || '{}'); } catch { return {}; }
+}
+function saveAssignment(startDate, item, storeKey) {
+  const a = getAssignments(startDate);
+  if (storeKey) a[item] = storeKey; else delete a[item];
+  localStorage.setItem(`msp_${startDate}`, JSON.stringify(a));
+}
 
 document.getElementById('shop-close').addEventListener('click', closeShoppingModal);
 document.getElementById('shop-close-btn').addEventListener('click', closeShoppingModal);
@@ -890,12 +894,20 @@ function closeShoppingModal() {
 
 async function openShoppingList(sundayDate) {
   shopCurrentDate = sundayDate;
+  shopChecked = {};
   document.getElementById('shop-overlay').classList.remove('hidden');
-  showShoppingSpinner();
+  _showShoppingSpinner();
 
-  // snapshot for polling
-  let snapshotDate = sundayDate;
+  // Try cached list first
+  try {
+    const cached = await fetch(`api/shopping-list/latest?start_date=${sundayDate}`);
+    if (cached.ok) {
+      const data = await cached.json();
+      if (data.items?.length) { _renderShoppingModal(data); return; }
+    }
+  } catch {}
 
+  // Generate new
   try {
     const res = await fetch('api/shopping-list', {
       method: 'POST',
@@ -904,21 +916,20 @@ async function openShoppingList(sundayDate) {
     });
     if (!res.ok) {
       let detail = `HTTP ${res.status}`;
-      try { const err = await res.json(); detail = err.detail || detail; } catch (_) {}
-      showShoppingError(`Fejl: ${detail}`); return;
+      try { const e = await res.json(); detail = e.detail || detail; } catch (_) {}
+      _showShoppingError(`Fejl: ${detail}`); return;
     }
-    shopData = await res.json();
-    renderShoppingModal(shopData);
+    _renderShoppingModal(await res.json());
   } catch (e) {
     if (e instanceof TypeError) {
-      const data = await pollForShoppingList(snapshotDate);
-      if (data) { shopData = data; renderShoppingModal(data); return; }
+      const data = await _pollShoppingList(sundayDate);
+      if (data) { _renderShoppingModal(data); return; }
     }
-    showShoppingError(`Fejl: ${e.message}`);
+    _showShoppingError(`Fejl: ${e.message}`);
   }
 }
 
-async function pollForShoppingList(startDate, maxSeconds = 180, intervalMs = 5000) {
+async function _pollShoppingList(startDate, maxSeconds = 180, intervalMs = 5000) {
   const deadline = Date.now() + maxSeconds * 1000;
   while (Date.now() < deadline) {
     await new Promise(r => setTimeout(r, intervalMs));
@@ -930,116 +941,167 @@ async function pollForShoppingList(startDate, maxSeconds = 180, intervalMs = 500
   return null;
 }
 
-function showShoppingSpinner() {
+function _showShoppingSpinner() {
   const d = new Date(shopCurrentDate + 'T12:00:00');
   const end = addDays(d, 6);
   document.getElementById('shop-subtitle').textContent =
     `${DAY_NAMES[dayOfWeekMon(d)]} ${formatDayDate(d)} – ${DAY_NAMES[dayOfWeekMon(end)]} ${formatDayDate(end)}`;
-  document.getElementById('shop-badges').innerHTML = '';
   document.getElementById('shop-tabs').innerHTML = '';
   document.getElementById('shop-body').innerHTML =
-    `<div class="thinking" style="padding:16px 0"><div class="dots"><span></span><span></span><span></span></div><span>Henter tilbud og laver indkøbsliste…</span></div>`;
+    `<div class="thinking" style="padding:20px 0"><div class="dots"><span></span><span></span><span></span></div><span>Laver indkøbsliste…</span></div>`;
 }
 
-function showShoppingError(msg) {
-  document.getElementById('shop-body').innerHTML =
-    `<div class="shop-empty">⚠ ${escapeHtml(msg)}</div>`;
+function _showShoppingError(msg) {
+  document.getElementById('shop-body').innerHTML = `<div class="shop-empty">⚠ ${escapeHtml(msg)}</div>`;
 }
 
-function renderShoppingModal(data) {
-  // Subtitle
+function _renderShoppingModal(data) {
   const d = new Date(data.start_date + 'T12:00:00');
   const end = new Date(data.end_date + 'T12:00:00');
   document.getElementById('shop-subtitle').textContent =
     `${DAY_NAMES[dayOfWeekMon(d)]} ${formatDayDate(d)} – ${DAY_NAMES[dayOfWeekMon(end)]} ${formatDayDate(end)}`;
 
-  // Source badges
-  const badgesEl = document.getElementById('shop-badges');
-  badgesEl.innerHTML = '';
-  if (data.has_salling_data) {
-    const b = document.createElement('span');
-    b.className = 'shop-badge live'; b.textContent = '📡 Salling (Føtex/Netto)';
-    badgesEl.appendChild(b);
-  }
-  if (data.has_lidl_data) {
-    const b = document.createElement('span');
-    b.className = 'shop-badge live'; b.textContent = '📡 Lidl tilbudsavis';
-    badgesEl.appendChild(b);
-  }
-  if (data.has_loevbjerg_data) {
-    const b = document.createElement('span');
-    b.className = 'shop-badge live'; b.textContent = '📡 Løvbjerg avis';
-    badgesEl.appendChild(b);
-  }
-  if (data.has_rema_data) {
-    const b = document.createElement('span');
-    b.className = 'shop-badge live'; b.textContent = '📡 Rema 1000 tilbud';
-    badgesEl.appendChild(b);
-  }
-  if (!data.has_salling_data && !data.has_lidl_data && !data.has_loevbjerg_data && !data.has_rema_data) {
-    const b = document.createElement('span');
-    b.className = 'shop-badge ai'; b.textContent = '⚪ Ingen live tilbudsdata';
-    badgesEl.appendChild(b);
-  }
+  shopItems = data.items || [];
 
-  // Tabs
+  // Build tabs
   const tabsEl = document.getElementById('shop-tabs');
   tabsEl.innerHTML = '';
-  const stores = data.stores || {};
-  STORE_ORDER.forEach(key => {
-    const meta = STORE_META[key];
-    const count = (stores[key] || []).length;
+  const assignments = getAssignments(shopCurrentDate);
+
+  const allBtn = document.createElement('button');
+  allBtn.className = `shop-tab${shopActiveTab === 'all' ? ' active' : ''}`;
+  allBtn.dataset.tab = 'all';
+  allBtn.innerHTML = `Alle <span class="shop-tab-count">${shopItems.length}</span>`;
+  allBtn.addEventListener('click', () => _switchTab('all'));
+  tabsEl.appendChild(allBtn);
+
+  STORES.forEach(({ key, label }) => {
+    const count = shopItems.filter(it => assignments[it] === key).length;
     const btn = document.createElement('button');
-    btn.className = `shop-tab${key === shopActiveTab ? ' active' : ''}`;
-    btn.dataset.store = key;
-    btn.innerHTML = `${meta.emoji} ${meta.label}<span class="shop-count">${count}</span>`;
-    btn.addEventListener('click', () => {
-      shopActiveTab = key;
-      document.querySelectorAll('.shop-tab').forEach(t => t.classList.toggle('active', t.dataset.store === key));
-      renderStoreItems(stores[key] || []);
-    });
+    btn.className = `shop-tab${shopActiveTab === key ? ' active' : ''}`;
+    btn.dataset.tab = key;
+    btn.innerHTML = `${label} <span class="shop-tab-count">${count}</span>`;
+    btn.addEventListener('click', () => _switchTab(key));
     tabsEl.appendChild(btn);
   });
 
-  // Open the first tab that has items, or 'other' as final fallback
-  const firstWithItems = STORE_ORDER.find(k => (stores[k] || []).length > 0) || 'other';
-  if (!stores[shopActiveTab]?.length) shopActiveTab = firstWithItems;
-  document.querySelectorAll('.shop-tab').forEach(t => t.classList.toggle('active', t.dataset.store === shopActiveTab));
-  renderStoreItems(stores[shopActiveTab] || []);
+  _renderBody();
 }
 
-function renderStoreItems(items) {
-  const body = document.getElementById('shop-body');
-  if (!items.length) {
-    body.innerHTML = '<div class="shop-empty">Ingen varer tildelt denne butik.</div>';
-    return;
-  }
-  body.innerHTML = '';
-  items.forEach(item => {
-    const row = document.createElement('div');
-    row.className = 'shop-item';
+function _switchTab(tab) {
+  shopActiveTab = tab;
+  document.querySelectorAll('.shop-tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
+  _renderBody();
+}
 
-    const cb = document.createElement('input');
-    cb.type = 'checkbox'; cb.className = 'shop-checkbox';
-    cb.addEventListener('change', () => {
-      textEl.style.textDecoration = cb.checked ? 'line-through' : '';
-      textEl.style.opacity = cb.checked ? '0.45' : '';
-    });
-    row.appendChild(cb);
-
-    // Detect "(TILBUD: X kr)" pattern and render as badge
-    const tilbudMatch = item.match(/^(.*?)\s*\(TILBUD:\s*(.+?)\)\s*$/i);
-    const textEl = document.createElement('div');
-    textEl.className = 'shop-item-text';
-    if (tilbudMatch) {
-      textEl.innerHTML = escapeHtml(tilbudMatch[1]) +
-        `<span class="tilbud-badge">TILBUD ${escapeHtml(tilbudMatch[2])}</span>`;
+function _refreshTabCounts() {
+  const assignments = getAssignments(shopCurrentDate);
+  document.querySelectorAll('.shop-tab').forEach(btn => {
+    const tab = btn.dataset.tab;
+    const countEl = btn.querySelector('.shop-tab-count');
+    if (!countEl) return;
+    if (tab === 'all') {
+      countEl.textContent = shopItems.length;
     } else {
-      textEl.textContent = item;
+      countEl.textContent = shopItems.filter(it => assignments[it] === tab).length;
     }
-    row.appendChild(textEl);
-    body.appendChild(row);
   });
+}
+
+function _renderBody() {
+  const body = document.getElementById('shop-body');
+  body.innerHTML = '';
+  if (!shopItems.length) { body.innerHTML = '<div class="shop-empty">Ingen varer på listen.</div>'; return; }
+
+  const assignments = getAssignments(shopCurrentDate);
+
+  if (shopActiveTab === 'all') {
+    // Group by store, unassigned at bottom
+    STORES.forEach(({ key, label }) => {
+      const storeItems = shopItems.filter(it => assignments[it] === key);
+      if (!storeItems.length) return;
+      const lbl = document.createElement('div');
+      lbl.className = 'shop-section-label';
+      lbl.textContent = label;
+      body.appendChild(lbl);
+      storeItems.forEach(it => body.appendChild(_makeRow(it, assignments)));
+    });
+    const unassigned = shopItems.filter(it => !assignments[it]);
+    if (unassigned.length) {
+      if (body.children.length) {
+        const lbl = document.createElement('div');
+        lbl.className = 'shop-unassigned-label';
+        lbl.textContent = 'Ikke tildelt';
+        body.appendChild(lbl);
+      }
+      unassigned.forEach(it => body.appendChild(_makeRow(it, assignments)));
+    }
+  } else {
+    // Store tab: assigned items first, then unassigned
+    const assigned = shopItems.filter(it => assignments[it] === shopActiveTab);
+    const unassigned = shopItems.filter(it => !assignments[it]);
+
+    if (!assigned.length && !unassigned.length) {
+      body.innerHTML = '<div class="shop-empty">Ingen varer.</div>'; return;
+    }
+    assigned.forEach(it => body.appendChild(_makeRow(it, assignments)));
+
+    if (unassigned.length) {
+      if (assigned.length) {
+        const hr = document.createElement('hr');
+        hr.className = 'shop-divider';
+        body.appendChild(hr);
+        const lbl = document.createElement('div');
+        lbl.className = 'shop-unassigned-label';
+        lbl.textContent = 'Ikke tildelt endnu';
+        body.appendChild(lbl);
+      }
+      unassigned.forEach(it => body.appendChild(_makeRow(it, assignments)));
+    }
+  }
+}
+
+function _makeRow(item, assignments) {
+  const row = document.createElement('div');
+  row.className = 'shop-item';
+
+  const cb = document.createElement('input');
+  cb.type = 'checkbox';
+  cb.className = 'shop-checkbox';
+  cb.checked = !!shopChecked[item];
+  const textEl = document.createElement('div');
+  textEl.className = 'shop-item-text';
+  textEl.textContent = item;
+  if (shopChecked[item]) { textEl.style.textDecoration = 'line-through'; textEl.style.opacity = '0.45'; }
+  cb.addEventListener('change', () => {
+    shopChecked[item] = cb.checked;
+    textEl.style.textDecoration = cb.checked ? 'line-through' : '';
+    textEl.style.opacity = cb.checked ? '0.45' : '';
+  });
+
+  const sel = document.createElement('select');
+  sel.className = `store-picker${assignments[item] ? ' assigned' : ''}`;
+  const none = document.createElement('option');
+  none.value = ''; none.textContent = '+ Vælg butik';
+  sel.appendChild(none);
+  STORES.forEach(({ key, label }) => {
+    const opt = document.createElement('option');
+    opt.value = key; opt.textContent = label;
+    if (assignments[item] === key) opt.selected = true;
+    sel.appendChild(opt);
+  });
+  sel.addEventListener('change', () => {
+    saveAssignment(shopCurrentDate, item, sel.value);
+    sel.classList.toggle('assigned', !!sel.value);
+    _refreshTabCounts();
+    // Re-render body to move items into correct position
+    _renderBody();
+  });
+
+  row.appendChild(cb);
+  row.appendChild(textEl);
+  row.appendChild(sel);
+  return row;
 }
 
 // ── Init ── //
