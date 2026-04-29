@@ -7,8 +7,8 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from typing import List
 from agent import MealPlanAgent
-from salling import find_store_ids, fetch_food_waste_offers
-from scraper import fetch_lidl_offers, fetch_loevbjerg_offers, fetch_rema_offers
+from salling import fetch_food_waste_offers
+from scraper import fetch_all_store_offers
 
 OPTIONS_FILE = "/data/options.json"
 MEAL_PLAN_FILE = "/data/meal_plan.json"
@@ -269,13 +269,12 @@ async def create_shopping_list(req: ShoppingListRequest):
 
     salling_offers: list = []
     if salling_key and postal_code:
-        store_ids = find_store_ids(salling_key, postal_code)
-        if store_ids:
-            salling_offers = fetch_food_waste_offers(salling_key, store_ids)
+        salling_offers = fetch_food_waste_offers(salling_key, postal_code)
 
-    lidl_offers = fetch_lidl_offers()
-    loevbjerg_offers = fetch_loevbjerg_offers()
-    rema_offers = fetch_rema_offers()
+    scraped = fetch_all_store_offers(postal_code)
+    lidl_offers = scraped.get("lidl", [])
+    loevbjerg_offers = scraped.get("loevbjerg", [])
+    rema_offers = scraped.get("rema", [])
 
     try:
         agent = make_agent()

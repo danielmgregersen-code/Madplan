@@ -2,63 +2,73 @@ import requests
 
 _BASE = "https://api.sallinggroup.com/v1"
 _TIMEOUT = 10
-_BRAND_MAP = {"foetex": "foetex", "netto": "netto"}
 
 
 def _headers(api_key: str) -> dict:
-    return {"Authorization": f"Bearer {api_key}"}
+    # Salling Group uses Ocp-Apim-Subscription-Key, not Bearer
+    return {"Ocp-Apim-Subscription-Key": api_key}
 
 
-def find_store_ids(api_key: str, postal_code: str) -> dict:
-    """Return {brand: [store_id, ...]} for Føtex and Netto stores near postal_code."""
+def _brand_from_store_name(name: str) -> str:
+    n = name.lower()
+    if "føtex" in n or "foetex" in n:
+        return "foetex"
+    if "netto" in n:
+        return "netto"
+    if "bilka" in n or "salling" in n:
+        return "foetex"  # group Bilka/Salling with Føtex
+    return ""
+
+
+def fetch_food_waste_offers(api_key: str, postal_code: str) -> list:
+    """Fetch near-expiry discounted items from all Salling stores near postal_code.
+
+    Uses GET /v1/food-waste/?zip={postal_code} which returns clearances for
+    all Salling-brand stores in the area in one call.
+    Returns: [{"store": "foetex"|"netto", "product": str, "price": str}]
+    """
     try:
         r = requests.get(
-            f"{_BASE}/stores",
-            params={"zip": postal_code, "per_page": 20},
+            f"{_BASE}/food-waste/",
+            params={"zip": postal_code},
             headers=_headers(api_key),
             timeout=_TIMEOUT,
         )
+        print(f"Salling food-waste status: {r.status_code} (zip={postal_code})", flush=True)
         r.raise_for_status()
-        stores = r.json()
-        result: dict = {"foetex": [], "netto": []}
-        for store in stores:
-            brand = store.get("brand", "").lower()
-            sid = store.get("id")
-            if brand in result and sid:
-                result[brand].append(sid)
-        return result
+        data = r.json()
+
+        # Response may be a list of clearance objects directly, or {"clearances": [...]}
+        if isinstance(data, dict):
+            items = data.get("clearances", [])
+        elif isinstance(data, list):
+            items = data
+        else:
+            items = []
+
+        offers = []
+        for item in items:
+            if not isinstance(item, dict):
+                continue
+            store_name = item.get("store_name", "")
+            brand = _brand_from_store_name(store_name)
+            if not brand:
+                continue
+            product = (
+                item.get("product_description")
+                or item.get("description")
+                or item.get("heading")
+                or ""
+            )
+            price = item.get("offer_new_price", item.get("newPrice", ""))
+            if not product:
+                continue
+            price_str = f"{price:.2f} kr".replace(".", ",") if isinstance(price, (int, float)) else str(price)
+            offers.append({"store": brand, "product": product, "price": price_str})
+
+        print(f"Salling: {len(offers)} food-waste offers ({postal_code})", flush=True)
+        return offers
+
     except Exception as e:
-        print(f"Salling find_store_ids error: {e}", flush=True)
-        return {}
-
-
-def fetch_food_waste_offers(api_key: str, store_ids: dict) -> list:
-    """Fetch discounted near-expiry products from Føtex + Netto stores.
-
-    Returns a flat list of dicts: {store, product, price}.
-    """
-    offers = []
-    for brand, ids in store_ids.items():
-        for sid in ids[:3]:  # limit to 3 stores per brand
-            try:
-                r = requests.get(
-                    f"{_BASE}/food-waste/{sid}",
-                    headers=_headers(api_key),
-                    timeout=_TIMEOUT,
-                )
-                r.raise_for_status()
-                data = r.json()
-                clearances = data.get("clearances", [])
-                for item in clearances:
-                    offer = item.get("offer", {})
-                    product = offer.get("description", "")
-                    price = offer.get("newPrice", "")
-                    if product:
-                        offers.append({
-                            "store": brand,
-                            "product": product,
-                            "price": f"{price} kr" if price else "",
-                        })
-            except Exception as e:
-                print(f"Salling food-waste error ({brand}/{sid}): {e}", flush=True)
-    return offers
+        print(f"Salling food-waste error: {e}", flush=True)
+        return []
