@@ -8,7 +8,7 @@ from pydantic import BaseModel
 from typing import List
 from agent import MealPlanAgent
 from salling import find_store_ids, fetch_food_waste_offers
-from scraper import fetch_lidl_offers, fetch_loevbjerg_offers
+from scraper import fetch_lidl_offers, fetch_loevbjerg_offers, fetch_rema_offers
 
 OPTIONS_FILE = "/data/options.json"
 MEAL_PLAN_FILE = "/data/meal_plan.json"
@@ -275,10 +275,13 @@ async def create_shopping_list(req: ShoppingListRequest):
 
     lidl_offers = fetch_lidl_offers()
     loevbjerg_offers = fetch_loevbjerg_offers()
+    rema_offers = fetch_rema_offers()
 
     try:
         agent = make_agent()
-        stores = agent.generate_shopping_list(start, plan, salling_offers, lidl_offers, loevbjerg_offers)
+        stores = agent.generate_shopping_list(
+            start, plan, salling_offers, lidl_offers, loevbjerg_offers, rema_offers
+        )
     except HTTPException:
         raise
     except Exception as e:
@@ -291,6 +294,7 @@ async def create_shopping_list(req: ShoppingListRequest):
         "has_salling_data": bool(salling_offers),
         "has_lidl_data": bool(lidl_offers),
         "has_loevbjerg_data": bool(loevbjerg_offers),
+        "has_rema_data": bool(rema_offers),
     }
     _save_json(SHOPPING_LIST_FILE, payload)
     return payload

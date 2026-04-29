@@ -88,6 +88,46 @@ def _parse_loevbjerg_direct(html: str) -> list:
     return list(dict.fromkeys(products))
 
 
+def fetch_rema_offers() -> list:
+    """Scrape current weekly offers from rema1000.dk.
+
+    Returns a list of product name strings.
+    Falls back to [] on any error.
+    """
+    attempts = [
+        ("https://www.rema1000.dk/tilbud", _parse_rema),
+        ("https://etilbudsavis.dk/Rema-1000", _parse_etilbudsavis),
+    ]
+    for url, parser in attempts:
+        try:
+            r = requests.get(url, headers=_HEADERS, timeout=_TIMEOUT)
+            r.raise_for_status()
+            products = parser(r.text)
+            if products:
+                print(f"Rema 1000 scrape: {len(products)} offers from {url}", flush=True)
+                return products
+        except Exception as e:
+            print(f"Rema 1000 scrape error ({url}): {e}", flush=True)
+    return []
+
+
+def _parse_rema(html: str) -> list:
+    soup = BeautifulSoup(html, "lxml")
+    products = []
+    for sel in [
+        "[class*='product-name']",
+        "[class*='productName']",
+        "[class*='offer-title']",
+        "[class*='item-title']",
+        ".product-card__name",
+        "h3", "h4",
+    ]:
+        found = [el.get_text(strip=True) for el in soup.select(sel) if el.get_text(strip=True)]
+        if found:
+            products.extend(found)
+    return list(dict.fromkeys(products))
+
+
 def _parse_etilbudsavis(html: str) -> list:
     soup = BeautifulSoup(html, "lxml")
     products = []

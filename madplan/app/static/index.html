@@ -862,13 +862,14 @@ function showToast(msg) {
 
 // ── Shopping list ── //
 const STORE_META = {
-  foetex:    { label: 'Føtex',       emoji: '🟢' },
-  loevbjerg: { label: 'Løvbjerg',    emoji: '🔵' },
-  netto:     { label: 'Netto',       emoji: '🟡' },
-  lidl:      { label: 'Lidl',        emoji: '🟠' },
-  other:     { label: 'Andre varer', emoji: '⚪' },
+  foetex:    { label: 'Føtex',    emoji: '🟢' },
+  loevbjerg: { label: 'Løvbjerg', emoji: '🔵' },
+  netto:     { label: 'Netto',    emoji: '🟡' },
+  lidl:      { label: 'Lidl',     emoji: '🟠' },
+  rema:      { label: 'Rema 1000',emoji: '🔴' },
+  other:     { label: 'Generelt', emoji: '⚪' },
 };
-const STORE_ORDER = ['foetex', 'loevbjerg', 'netto', 'lidl', 'other'];
+const STORE_ORDER = ['foetex', 'loevbjerg', 'netto', 'lidl', 'rema', 'other'];
 
 let shopCurrentDate = null;
 let shopActiveTab = 'foetex';
@@ -970,9 +971,14 @@ function renderShoppingModal(data) {
     b.className = 'shop-badge live'; b.textContent = '📡 Løvbjerg avis';
     badgesEl.appendChild(b);
   }
-  if (!data.has_salling_data && !data.has_lidl_data && !data.has_loevbjerg_data) {
+  if (data.has_rema_data) {
     const b = document.createElement('span');
-    b.className = 'shop-badge ai'; b.textContent = '🤖 AI-fordelt (ingen live tilbudsdata)';
+    b.className = 'shop-badge live'; b.textContent = '📡 Rema 1000 tilbud';
+    badgesEl.appendChild(b);
+  }
+  if (!data.has_salling_data && !data.has_lidl_data && !data.has_loevbjerg_data && !data.has_rema_data) {
+    const b = document.createElement('span');
+    b.className = 'shop-badge ai'; b.textContent = '⚪ Ingen live tilbudsdata';
     badgesEl.appendChild(b);
   }
 

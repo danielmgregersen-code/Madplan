@@ -223,11 +223,15 @@ class MealPlanAgent:
         salling_offers: list,
         lidl_offers: list,
         loevbjerg_offers: list,
+        rema_offers: list,
     ) -> dict:
-        """Organise a 7-day ingredient list by store, using real offer data where available."""
+        """Organise a 7-day ingredient list by store, using real offer data where available.
+
+        Items on sale at a specific store go to that store's list.
+        Everything else goes to 'other' (the general list).
+        """
         total = self.num_adults + self.num_children
 
-        # Collect all ingredients for the 7-day window
         raw_ingredients: list[str] = []
         for i in range(7):
             d = start_date + timedelta(days=i)
@@ -237,46 +241,47 @@ class MealPlanAgent:
                 meal = day_data.get(meal_type) or {}
                 raw_ingredients.extend(meal.get("ingredients", []))
 
+        empty = {"foetex": [], "loevbjerg": [], "netto": [], "lidl": [], "rema": [], "other": []}
         if not raw_ingredients:
-            return {"foetex": [], "loevbjerg": [], "netto": [], "lidl": [], "other": []}
+            return empty
 
         end_date = start_date + timedelta(days=6)
         start_label = f"{_DANISH_DAYS[start_date.weekday()]} {start_date.day}. {_DANISH_MONTHS[start_date.month-1]}"
         end_label = f"{_DANISH_DAYS[end_date.weekday()]} {end_date.day}. {_DANISH_MONTHS[end_date.month-1]}"
 
         system = f"""Du er en indkøbsassistent for en dansk familie med {total} personer.
-Du modtager en ingrediensliste for {start_label} til {end_label} og skal fordele varerne på følgende butikker:
-- **foetex** (Føtex): friske råvarer, kvalitetsprodukter, større pakker
-- **loevbjerg** (Løvbjerg): lokale/regionale produkter, slagterafdelingen
-- **netto** (Netto): hverdagsbasics, mejeri, brød, dåsevarer
-- **lidl** (Lidl): billige basisvarer, importerede varer, grøntsager, bageartikler
-- **other** (Andre varer): varer der ikke passer til nogen bestemt butik
+Du modtager en ingrediensliste for {start_label} til {end_label}.
 
-Regler:
-- Konsolider lignende ingredienser (fx to tomat-poster → én linje)
-- Skriv mængder på dansk, fx "400g hakket oksekød"
-- Varer der er i tilbud i en bestemt butik → læg dem der, tilføj "(TILBUD: X kr)" sidst
-- Fordel resten fornuftigt baseret på butiksprofil
-- Svar KUN ved at kalde set_shopping_list — ingen tekst ved siden af"""
+Regler — følg dem præcist:
+1. Konsolider lignende ingredienser (fx to tomat-poster → én linje med samlet mængde).
+2. En vare placeres i en butiks liste KUN hvis den er i tilbud i den pågældende butik.
+   Tilføj "(TILBUD: X kr)" sidst på linjen, fx "400g hakket oksekød (TILBUD: 19,95 kr)".
+3. Alle varer der IKKE er i tilbud placeres i **other** (Generelt).
+   Placer IKKE varer i en butik baseret på gæt eller butiksprofil — kun ved reelle tilbud.
+4. Svar KUN ved at kalde set_shopping_list — ingen forklarende tekst."""
 
         offer_context_parts = []
         if salling_offers:
             foetex_s = [o for o in salling_offers if o["store"] == "foetex"]
-            netto_s = [o for o in salling_offers if o["store"] == "netto"]
+            netto_s  = [o for o in salling_offers if o["store"] == "netto"]
             if foetex_s:
-                offer_context_parts.append("Føtex tilbud (Salling): " +
+                offer_context_parts.append("Føtex tilbud: " +
                     ", ".join(f"{o['product']} {o['price']}" for o in foetex_s[:20]))
             if netto_s:
-                offer_context_parts.append("Netto tilbud (Salling): " +
+                offer_context_parts.append("Netto tilbud: " +
                     ", ".join(f"{o['product']} {o['price']}" for o in netto_s[:20]))
         if lidl_offers:
-            offer_context_parts.append("Lidl tilbud (scraped): " + ", ".join(lidl_offers[:30]))
+            offer_context_parts.append("Lidl tilbud: " + ", ".join(lidl_offers[:30]))
         if loevbjerg_offers:
-            offer_context_parts.append("Løvbjerg tilbud (scraped): " + ", ".join(loevbjerg_offers[:30]))
+            offer_context_parts.append("Løvbjerg tilbud: " + ", ".join(loevbjerg_offers[:30]))
+        if rema_offers:
+            offer_context_parts.append("Rema 1000 tilbud: " + ", ".join(rema_offers[:30]))
 
         user_msg = "Ingredienser:\n" + "\n".join(f"- {ing}" for ing in raw_ingredients)
         if offer_context_parts:
             user_msg += "\n\nAktuelle tilbud:\n" + "\n".join(offer_context_parts)
+        else:
+            user_msg += "\n\nIngen tilbudsdata tilgængelig — placer alle varer i 'other'."
 
         tool = {
             "type": "function",
@@ -293,9 +298,10 @@ Regler:
                                 "loevbjerg": {"type": "array", "items": {"type": "string"}},
                                 "netto":     {"type": "array", "items": {"type": "string"}},
                                 "lidl":      {"type": "array", "items": {"type": "string"}},
+                                "rema":      {"type": "array", "items": {"type": "string"}},
                                 "other":     {"type": "array", "items": {"type": "string"}},
                             },
-                            "required": ["foetex", "loevbjerg", "netto", "lidl", "other"],
+                            "required": ["foetex", "loevbjerg", "netto", "lidl", "rema", "other"],
                         }
                     },
                     "required": ["stores"],
@@ -325,8 +331,9 @@ Regler:
                     "loevbjerg": stores.get("loevbjerg", []),
                     "netto":     stores.get("netto", []),
                     "lidl":      stores.get("lidl", []),
+                    "rema":      stores.get("rema", []),
                     "other":     stores.get("other", []),
                 }
 
-        # Fallback: dump everything in other
-        return {"foetex": [], "loevbjerg": [], "netto": [], "lidl": [], "other": list(set(raw_ingredients))}
+        # Fallback: everything in general list
+        return {**empty, "other": list(dict.fromkeys(raw_ingredients))}
