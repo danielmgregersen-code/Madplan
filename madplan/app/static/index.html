@@ -1001,6 +1001,10 @@ function renderShoppingModal(data) {
     tabsEl.appendChild(btn);
   });
 
+  // Open the first tab that has items, or 'other' as final fallback
+  const firstWithItems = STORE_ORDER.find(k => (stores[k] || []).length > 0) || 'other';
+  if (!stores[shopActiveTab]?.length) shopActiveTab = firstWithItems;
+  document.querySelectorAll('.shop-tab').forEach(t => t.classList.toggle('active', t.dataset.store === shopActiveTab));
   renderStoreItems(stores[shopActiveTab] || []);
 }
 
@@ -1017,6 +1021,10 @@ function renderStoreItems(items) {
 
     const cb = document.createElement('input');
     cb.type = 'checkbox'; cb.className = 'shop-checkbox';
+    cb.addEventListener('change', () => {
+      textEl.style.textDecoration = cb.checked ? 'line-through' : '';
+      textEl.style.opacity = cb.checked ? '0.45' : '';
+    });
     row.appendChild(cb);
 
     // Detect "(TILBUD: X kr)" pattern and render as badge
