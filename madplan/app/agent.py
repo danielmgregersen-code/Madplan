@@ -213,3 +213,120 @@ class MealPlanAgent:
             applied.append(f"{d} {meal_type}: {u.get('name', '')}")
 
         return json.dumps({"applied": applied, "count": len(applied)})
+
+    # ── Shopping list ──
+
+    def generate_shopping_list(
+        self,
+        start_date: date,
+        meal_plan: dict,
+        salling_offers: list,
+        lidl_offers: list,
+        loevbjerg_offers: list,
+    ) -> dict:
+        """Organise a 7-day ingredient list by store, using real offer data where available."""
+        total = self.num_adults + self.num_children
+
+        # Collect all ingredients for the 7-day window
+        raw_ingredients: list[str] = []
+        for i in range(7):
+            d = start_date + timedelta(days=i)
+            key = d.isoformat()
+            day_data = meal_plan.get(key, {})
+            for meal_type in ("vegetarian", "kids"):
+                meal = day_data.get(meal_type) or {}
+                raw_ingredients.extend(meal.get("ingredients", []))
+
+        if not raw_ingredients:
+            return {"foetex": [], "loevbjerg": [], "netto": [], "lidl": [], "other": []}
+
+        end_date = start_date + timedelta(days=6)
+        start_label = f"{_DANISH_DAYS[start_date.weekday()]} {start_date.day}. {_DANISH_MONTHS[start_date.month-1]}"
+        end_label = f"{_DANISH_DAYS[end_date.weekday()]} {end_date.day}. {_DANISH_MONTHS[end_date.month-1]}"
+
+        system = f"""Du er en indkøbsassistent for en dansk familie med {total} personer.
+Du modtager en ingrediensliste for {start_label} til {end_label} og skal fordele varerne på følgende butikker:
+- **foetex** (Føtex): friske råvarer, kvalitetsprodukter, større pakker
+- **loevbjerg** (Løvbjerg): lokale/regionale produkter, slagterafdelingen
+- **netto** (Netto): hverdagsbasics, mejeri, brød, dåsevarer
+- **lidl** (Lidl): billige basisvarer, importerede varer, grøntsager, bageartikler
+- **other** (Andre varer): varer der ikke passer til nogen bestemt butik
+
+Regler:
+- Konsolider lignende ingredienser (fx to tomat-poster → én linje)
+- Skriv mængder på dansk, fx "400g hakket oksekød"
+- Varer der er i tilbud i en bestemt butik → læg dem der, tilføj "(TILBUD: X kr)" sidst
+- Fordel resten fornuftigt baseret på butiksprofil
+- Svar KUN ved at kalde set_shopping_list — ingen tekst ved siden af"""
+
+        offer_context_parts = []
+        if salling_offers:
+            foetex_s = [o for o in salling_offers if o["store"] == "foetex"]
+            netto_s = [o for o in salling_offers if o["store"] == "netto"]
+            if foetex_s:
+                offer_context_parts.append("Føtex tilbud (Salling): " +
+                    ", ".join(f"{o['product']} {o['price']}" for o in foetex_s[:20]))
+            if netto_s:
+                offer_context_parts.append("Netto tilbud (Salling): " +
+                    ", ".join(f"{o['product']} {o['price']}" for o in netto_s[:20]))
+        if lidl_offers:
+            offer_context_parts.append("Lidl tilbud (scraped): " + ", ".join(lidl_offers[:30]))
+        if loevbjerg_offers:
+            offer_context_parts.append("Løvbjerg tilbud (scraped): " + ", ".join(loevbjerg_offers[:30]))
+
+        user_msg = "Ingredienser:\n" + "\n".join(f"- {ing}" for ing in raw_ingredients)
+        if offer_context_parts:
+            user_msg += "\n\nAktuelle tilbud:\n" + "\n".join(offer_context_parts)
+
+        tool = {
+            "type": "function",
+            "function": {
+                "name": "set_shopping_list",
+                "description": "Angiv den færdige indkøbsliste fordelt på butikker",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "stores": {
+                            "type": "object",
+                            "properties": {
+                                "foetex":    {"type": "array", "items": {"type": "string"}},
+                                "loevbjerg": {"type": "array", "items": {"type": "string"}},
+                                "netto":     {"type": "array", "items": {"type": "string"}},
+                                "lidl":      {"type": "array", "items": {"type": "string"}},
+                                "other":     {"type": "array", "items": {"type": "string"}},
+                            },
+                            "required": ["foetex", "loevbjerg", "netto", "lidl", "other"],
+                        }
+                    },
+                    "required": ["stores"],
+                },
+            },
+        }
+
+        messages = [
+            {"role": "system", "content": system},
+            {"role": "user", "content": user_msg},
+        ]
+
+        for _ in range(4):
+            response = self.client.chat.completions.create(
+                model=self.model,
+                messages=messages,
+                tools=[tool],
+                tool_choice={"type": "function", "function": {"name": "set_shopping_list"}},
+            )
+            msg = response.choices[0].message
+            if msg.tool_calls:
+                tc = msg.tool_calls[0]
+                args = json.loads(tc.function.arguments)
+                stores = args.get("stores", {})
+                return {
+                    "foetex":    stores.get("foetex", []),
+                    "loevbjerg": stores.get("loevbjerg", []),
+                    "netto":     stores.get("netto", []),
+                    "lidl":      stores.get("lidl", []),
+                    "other":     stores.get("other", []),
+                }
+
+        # Fallback: dump everything in other
+        return {"foetex": [], "loevbjerg": [], "netto": [], "lidl": [], "other": list(set(raw_ingredients))}

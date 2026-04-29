@@ -7,11 +7,14 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from typing import List
 from agent import MealPlanAgent
+from salling import find_store_ids, fetch_food_waste_offers
+from scraper import fetch_lidl_offers, fetch_loevbjerg_offers
 
 OPTIONS_FILE = "/data/options.json"
 MEAL_PLAN_FILE = "/data/meal_plan.json"
 CHAT_HISTORY_FILE = "/data/chat_history.json"
 FAVORITES_FILE = "/data/favorites.json"
+SHOPPING_LIST_FILE = "/data/shopping_list.json"
 MAX_HISTORY_MESSAGES = 100
 
 # Plan window: 2 weeks back + today + 2 weeks ahead = 35 days
@@ -244,6 +247,61 @@ def get_chat_history():
 def clear_chat_history():
     save_chat_history([])
     return {"ok": True}
+
+
+# ── Shopping list ──
+
+class ShoppingListRequest(BaseModel):
+    start_date: str   # YYYY-MM-DD (should be a Sunday)
+
+
+@app.post("/api/shopping-list")
+async def create_shopping_list(req: ShoppingListRequest):
+    try:
+        start = date.fromisoformat(req.start_date)
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Ugyldig dato — brug YYYY-MM-DD format")
+
+    opts = load_options()
+    salling_key = opts.get("salling_api_key", "").strip()
+    postal_code = opts.get("postal_code", "").strip()
+    plan = load_meal_plan()
+
+    salling_offers: list = []
+    if salling_key and postal_code:
+        store_ids = find_store_ids(salling_key, postal_code)
+        if store_ids:
+            salling_offers = fetch_food_waste_offers(salling_key, store_ids)
+
+    lidl_offers = fetch_lidl_offers()
+    loevbjerg_offers = fetch_loevbjerg_offers()
+
+    try:
+        agent = make_agent()
+        stores = agent.generate_shopping_list(start, plan, salling_offers, lidl_offers, loevbjerg_offers)
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+    payload = {
+        "start_date": req.start_date,
+        "end_date": (start + timedelta(days=6)).isoformat(),
+        "stores": stores,
+        "has_salling_data": bool(salling_offers),
+        "has_lidl_data": bool(lidl_offers),
+        "has_loevbjerg_data": bool(loevbjerg_offers),
+    }
+    _save_json(SHOPPING_LIST_FILE, payload)
+    return payload
+
+
+@app.get("/api/shopping-list/latest")
+def get_latest_shopping_list(start_date: str):
+    data = _load_json(SHOPPING_LIST_FILE, None)
+    if data and data.get("start_date") == start_date:
+        return data
+    raise HTTPException(status_code=404, detail="Ingen gemt indkøbsliste for denne dato")
 
 
 app.mount("/", StaticFiles(directory="static", html=True), name="static")

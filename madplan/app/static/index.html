@@ -141,6 +141,43 @@
   .fav-remove { background: none; border: none; color: var(--muted); font-size: 16px; cursor: pointer; line-height: 1; }
   .fav-remove:hover { color: var(--danger); }
 
+  /* ── Shopping list trigger card ── */
+  .shopping-trigger-card { background: rgba(74,240,160,0.05); border: 1px dashed rgba(74,240,160,0.35); border-radius: 8px; padding: 8px 10px; cursor: pointer; display: flex; align-items: center; gap: 7px; transition: background 0.15s, border-color 0.15s; }
+  .shopping-trigger-card:hover { background: rgba(74,240,160,0.1); border-color: var(--accent); }
+  .shopping-trigger-card strong { font-size: 11px; color: var(--accent); }
+  .shopping-sub { font-size: 9px; color: var(--muted); margin-left: auto; }
+
+  /* ── Shopping list modal ── */
+  .shop-modal { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); width: 100%; max-width: 560px; max-height: 90dvh; display: flex; flex-direction: column; overflow: hidden; }
+  .shop-header { padding: 14px 18px 10px; border-bottom: 1px solid var(--border); flex-shrink: 0; }
+  .shop-header-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+  .shop-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 15px; margin-bottom: 4px; }
+  .shop-subtitle { font-size: 10px; color: var(--muted); margin-bottom: 6px; }
+  .shop-badges { display: flex; gap: 5px; flex-wrap: wrap; }
+  .shop-badge { font-size: 9px; padding: 2px 7px; border-radius: 5px; border: 1px solid; }
+  .shop-badge.live { border-color: var(--accent); color: var(--accent); background: rgba(74,240,160,0.08); }
+  .shop-badge.ai { border-color: var(--border); color: var(--muted); }
+
+  .shop-tabs { display: flex; gap: 3px; padding: 10px 18px 0; flex-shrink: 0; border-bottom: 1px solid var(--border); overflow-x: auto; }
+  .shop-tab { background: none; border: none; border-bottom: 2px solid transparent; color: var(--muted); font-family: 'DM Mono', monospace; font-size: 11px; padding: 6px 10px 8px; cursor: pointer; white-space: nowrap; transition: all 0.15s; }
+  .shop-tab:hover { color: var(--text); }
+  .shop-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+  .shop-tab .shop-count { font-size: 9px; color: var(--muted); margin-left: 3px; }
+  .shop-tab.active .shop-count { color: var(--accent); }
+
+  .shop-body { flex: 1; overflow-y: auto; padding: 12px 18px; }
+  .shop-body::-webkit-scrollbar { width: 3px; }
+  .shop-body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+  .shop-empty { font-size: 11px; color: var(--muted); font-style: italic; padding: 12px 0; }
+  .shop-item { display: flex; align-items: flex-start; gap: 9px; padding: 6px 0; border-bottom: 1px solid rgba(37,42,58,0.5); }
+  .shop-item:last-child { border-bottom: none; }
+  .shop-checkbox { width: 15px; height: 15px; border: 1px solid var(--border); border-radius: 3px; flex-shrink: 0; margin-top: 2px; cursor: pointer; appearance: none; background: var(--surface2); transition: background 0.15s; }
+  .shop-checkbox:checked { background: var(--accent); border-color: var(--accent); }
+  .shop-item-text { font-size: 11px; color: var(--text); line-height: 1.5; flex: 1; }
+  .tilbud-badge { display: inline-block; background: rgba(240,196,74,0.15); border: 1px solid rgba(240,196,74,0.4); color: var(--accent2); font-size: 9px; padding: 1px 5px; border-radius: 4px; margin-left: 5px; white-space: nowrap; }
+
+  .shop-footer { padding: 10px 18px; border-top: 1px solid var(--border); display: flex; gap: 7px; justify-content: flex-end; flex-shrink: 0; }
+
   /* ── Spinner / Toast ── */
   .spinner { display: inline-block; width: 11px; height: 11px; border: 2px solid rgba(74,240,160,0.3); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.6s linear infinite; }
   @keyframes spin { to { transform: rotate(360deg); } }
@@ -268,6 +305,33 @@
   </div>
 </div>
 
+<!-- Shopping list modal -->
+<div class="modal-overlay hidden" id="shop-overlay">
+  <div class="shop-modal">
+    <div class="shop-header">
+      <div class="shop-header-row">
+        <div>
+          <div class="shop-title">🛒 Indkøbsliste</div>
+          <div class="shop-subtitle" id="shop-subtitle"></div>
+          <div class="shop-badges" id="shop-badges"></div>
+        </div>
+        <button class="modal-close" id="shop-close">✕</button>
+      </div>
+    </div>
+    <div class="shop-tabs" id="shop-tabs"></div>
+    <div class="shop-body" id="shop-body">
+      <div class="thinking" id="shop-thinking" style="padding:16px 0">
+        <div class="dots"><span></span><span></span><span></span></div>
+        <span>Henter tilbud og laver indkøbsliste…</span>
+      </div>
+    </div>
+    <div class="shop-footer">
+      <button class="btn-ghost" id="shop-regenerate">Generer igen</button>
+      <button class="btn" id="shop-close-btn">Luk</button>
+    </div>
+  </div>
+</div>
+
 <div id="toast"></div>
 
 <script>
@@ -346,6 +410,15 @@ function renderGrid() {
       thaw.className = 'thaw-card';
       thaw.innerHTML = `<div class="thaw-icon">🧊</div><div class="thaw-text"><div class="thaw-label">Optø til i morgen</div>${escapeHtml(tomorrowKids.thaw)}</div>`;
       col.appendChild(thaw);
+    }
+
+    // Shopping list trigger on Sundays
+    if (dayOfWeekMon(d) === 6) {
+      const shopCard = document.createElement('div');
+      shopCard.className = 'shopping-trigger-card';
+      shopCard.innerHTML = `<span>🛒</span><strong>Indkøbsliste</strong><span class="shopping-sub">Sø–Lø</span>`;
+      shopCard.addEventListener('click', () => openShoppingList(key));
+      col.appendChild(shopCard);
     }
 
     grid.appendChild(col);
@@ -785,6 +858,174 @@ function showToast(msg) {
   t.textContent = msg; t.classList.add('show');
   clearTimeout(toastTimer);
   toastTimer = setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// ── Shopping list ── //
+const STORE_META = {
+  foetex:    { label: 'Føtex',       emoji: '🟢' },
+  loevbjerg: { label: 'Løvbjerg',    emoji: '🔵' },
+  netto:     { label: 'Netto',       emoji: '🟡' },
+  lidl:      { label: 'Lidl',        emoji: '🟠' },
+  other:     { label: 'Andre varer', emoji: '⚪' },
+};
+const STORE_ORDER = ['foetex', 'loevbjerg', 'netto', 'lidl', 'other'];
+
+let shopCurrentDate = null;
+let shopActiveTab = 'foetex';
+let shopData = null;
+
+document.getElementById('shop-close').addEventListener('click', closeShoppingModal);
+document.getElementById('shop-close-btn').addEventListener('click', closeShoppingModal);
+document.getElementById('shop-overlay').addEventListener('click', e => {
+  if (e.target === document.getElementById('shop-overlay')) closeShoppingModal();
+});
+document.getElementById('shop-regenerate').addEventListener('click', () => {
+  if (shopCurrentDate) openShoppingList(shopCurrentDate);
+});
+
+function closeShoppingModal() {
+  document.getElementById('shop-overlay').classList.add('hidden');
+}
+
+async function openShoppingList(sundayDate) {
+  shopCurrentDate = sundayDate;
+  document.getElementById('shop-overlay').classList.remove('hidden');
+  showShoppingSpinner();
+
+  // snapshot for polling
+  let snapshotDate = sundayDate;
+
+  try {
+    const res = await fetch('api/shopping-list', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ start_date: sundayDate }),
+    });
+    if (!res.ok) {
+      let detail = `HTTP ${res.status}`;
+      try { const err = await res.json(); detail = err.detail || detail; } catch (_) {}
+      showShoppingError(`Fejl: ${detail}`); return;
+    }
+    shopData = await res.json();
+    renderShoppingModal(shopData);
+  } catch (e) {
+    if (e instanceof TypeError) {
+      const data = await pollForShoppingList(snapshotDate);
+      if (data) { shopData = data; renderShoppingModal(data); return; }
+    }
+    showShoppingError(`Fejl: ${e.message}`);
+  }
+}
+
+async function pollForShoppingList(startDate, maxSeconds = 180, intervalMs = 5000) {
+  const deadline = Date.now() + maxSeconds * 1000;
+  while (Date.now() < deadline) {
+    await new Promise(r => setTimeout(r, intervalMs));
+    try {
+      const res = await fetch(`api/shopping-list/latest?start_date=${startDate}`);
+      if (res.ok) return await res.json();
+    } catch {}
+  }
+  return null;
+}
+
+function showShoppingSpinner() {
+  const d = new Date(shopCurrentDate + 'T12:00:00');
+  const end = addDays(d, 6);
+  document.getElementById('shop-subtitle').textContent =
+    `${DAY_NAMES[dayOfWeekMon(d)]} ${formatDayDate(d)} – ${DAY_NAMES[dayOfWeekMon(end)]} ${formatDayDate(end)}`;
+  document.getElementById('shop-badges').innerHTML = '';
+  document.getElementById('shop-tabs').innerHTML = '';
+  document.getElementById('shop-body').innerHTML =
+    `<div class="thinking" style="padding:16px 0"><div class="dots"><span></span><span></span><span></span></div><span>Henter tilbud og laver indkøbsliste…</span></div>`;
+}
+
+function showShoppingError(msg) {
+  document.getElementById('shop-body').innerHTML =
+    `<div class="shop-empty">⚠ ${escapeHtml(msg)}</div>`;
+}
+
+function renderShoppingModal(data) {
+  // Subtitle
+  const d = new Date(data.start_date + 'T12:00:00');
+  const end = new Date(data.end_date + 'T12:00:00');
+  document.getElementById('shop-subtitle').textContent =
+    `${DAY_NAMES[dayOfWeekMon(d)]} ${formatDayDate(d)} – ${DAY_NAMES[dayOfWeekMon(end)]} ${formatDayDate(end)}`;
+
+  // Source badges
+  const badgesEl = document.getElementById('shop-badges');
+  badgesEl.innerHTML = '';
+  if (data.has_salling_data) {
+    const b = document.createElement('span');
+    b.className = 'shop-badge live'; b.textContent = '📡 Salling (Føtex/Netto)';
+    badgesEl.appendChild(b);
+  }
+  if (data.has_lidl_data) {
+    const b = document.createElement('span');
+    b.className = 'shop-badge live'; b.textContent = '📡 Lidl tilbudsavis';
+    badgesEl.appendChild(b);
+  }
+  if (data.has_loevbjerg_data) {
+    const b = document.createElement('span');
+    b.className = 'shop-badge live'; b.textContent = '📡 Løvbjerg avis';
+    badgesEl.appendChild(b);
+  }
+  if (!data.has_salling_data && !data.has_lidl_data && !data.has_loevbjerg_data) {
+    const b = document.createElement('span');
+    b.className = 'shop-badge ai'; b.textContent = '🤖 AI-fordelt (ingen live tilbudsdata)';
+    badgesEl.appendChild(b);
+  }
+
+  // Tabs
+  const tabsEl = document.getElementById('shop-tabs');
+  tabsEl.innerHTML = '';
+  const stores = data.stores || {};
+  STORE_ORDER.forEach(key => {
+    const meta = STORE_META[key];
+    const count = (stores[key] || []).length;
+    const btn = document.createElement('button');
+    btn.className = `shop-tab${key === shopActiveTab ? ' active' : ''}`;
+    btn.dataset.store = key;
+    btn.innerHTML = `${meta.emoji} ${meta.label}<span class="shop-count">${count}</span>`;
+    btn.addEventListener('click', () => {
+      shopActiveTab = key;
+      document.querySelectorAll('.shop-tab').forEach(t => t.classList.toggle('active', t.dataset.store === key));
+      renderStoreItems(stores[key] || []);
+    });
+    tabsEl.appendChild(btn);
+  });
+
+  renderStoreItems(stores[shopActiveTab] || []);
+}
+
+function renderStoreItems(items) {
+  const body = document.getElementById('shop-body');
+  if (!items.length) {
+    body.innerHTML = '<div class="shop-empty">Ingen varer tildelt denne butik.</div>';
+    return;
+  }
+  body.innerHTML = '';
+  items.forEach(item => {
+    const row = document.createElement('div');
+    row.className = 'shop-item';
+
+    const cb = document.createElement('input');
+    cb.type = 'checkbox'; cb.className = 'shop-checkbox';
+    row.appendChild(cb);
+
+    // Detect "(TILBUD: X kr)" pattern and render as badge
+    const tilbudMatch = item.match(/^(.*?)\s*\(TILBUD:\s*(.+?)\)\s*$/i);
+    const textEl = document.createElement('div');
+    textEl.className = 'shop-item-text';
+    if (tilbudMatch) {
+      textEl.innerHTML = escapeHtml(tilbudMatch[1]) +
+        `<span class="tilbud-badge">TILBUD ${escapeHtml(tilbudMatch[2])}</span>`;
+    } else {
+      textEl.textContent = item;
+    }
+    row.appendChild(textEl);
+    body.appendChild(row);
+  });
 }
 
 // ── Init ── //
