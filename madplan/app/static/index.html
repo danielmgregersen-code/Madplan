@@ -8,143 +8,143 @@
 <style>
   :root {
     --bg: #0d0f14; --surface: #14171f; --surface2: #1c2030;
-    --border: #252a3a; --accent: #4af0a0; --accent2: #f0c44a;
-    --text: #e8eaf0; --muted: #5a6080;
+    --border: #252a3a; --accent: #4af0a0; --accent2: #f0c44a; --accent3: #4ab4f0;
+    --text: #e8eaf0; --muted: #5a6080; --danger: #f06060;
     --radius: 12px;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { background: var(--bg); color: var(--text); font-family: 'DM Mono', monospace; height: 100dvh; display: flex; flex-direction: column; overflow: hidden; }
 
   /* ── Header ── */
-  header {
-    background: var(--surface); border-bottom: 1px solid var(--border);
-    padding: 12px 20px; display: flex; align-items: center;
-    justify-content: space-between; flex-shrink: 0; gap: 12px; flex-wrap: wrap;
-  }
-  .header-left { display: flex; align-items: center; gap: 12px; }
-  .logo { width: 36px; height: 36px; background: var(--accent); border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 20px; }
-  .header-text h1 { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 15px; letter-spacing: 0.02em; }
-  .header-text p { font-size: 11px; color: var(--muted); margin-top: 1px; }
+  header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 10px 16px; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; gap: 10px; flex-wrap: wrap; }
+  .header-left { display: flex; align-items: center; gap: 10px; }
+  .logo { width: 32px; height: 32px; background: var(--accent); border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 18px; }
+  .header-text h1 { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 14px; letter-spacing: 0.02em; }
+  .header-text p { font-size: 10px; color: var(--muted); margin-top: 1px; }
 
-  .week-tabs { display: flex; gap: 4px; }
-  .tab { background: none; border: 1px solid var(--border); color: var(--muted); font-family: 'DM Mono', monospace; font-size: 11px; padding: 6px 12px; border-radius: 8px; cursor: pointer; transition: all 0.15s; }
+  .week-tabs { display: flex; gap: 3px; flex-wrap: wrap; }
+  .tab { background: none; border: 1px solid var(--border); color: var(--muted); font-family: 'DM Mono', monospace; font-size: 10px; padding: 5px 10px; border-radius: 7px; cursor: pointer; transition: all 0.15s; white-space: nowrap; }
   .tab:hover { border-color: var(--accent); color: var(--accent); }
   .tab.active { border-color: var(--accent); color: var(--accent); background: rgba(74,240,160,0.08); }
 
-  .btn { background: var(--accent); border: none; color: #0d0f14; font-family: 'DM Mono', monospace; font-size: 11px; font-weight: 500; padding: 7px 14px; border-radius: 8px; cursor: pointer; transition: opacity 0.15s; }
+  .header-right { display: flex; align-items: center; gap: 6px; }
+  .btn { background: var(--accent); border: none; color: #0d0f14; font-family: 'DM Mono', monospace; font-size: 11px; font-weight: 500; padding: 6px 12px; border-radius: 8px; cursor: pointer; transition: opacity 0.15s; white-space: nowrap; }
   .btn:hover { opacity: 0.85; }
   .btn:disabled { opacity: 0.4; cursor: not-allowed; }
-  .btn-ghost { background: none; border: 1px solid var(--border); color: var(--muted); font-family: 'DM Mono', monospace; font-size: 11px; padding: 6px 12px; border-radius: 8px; cursor: pointer; transition: all 0.15s; }
+  .btn-ghost { background: none; border: 1px solid var(--border); color: var(--muted); font-family: 'DM Mono', monospace; font-size: 11px; padding: 5px 10px; border-radius: 8px; cursor: pointer; transition: all 0.15s; }
   .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+  .btn-icon { background: none; border: 1px solid var(--border); color: var(--muted); font-size: 16px; width: 32px; height: 32px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.15s; }
+  .btn-icon:hover { border-color: var(--accent2); color: var(--accent2); }
+  .btn-icon.active { border-color: var(--accent2); color: var(--accent2); background: rgba(240,196,74,0.1); }
 
   /* ── Main ── */
   .main { display: flex; flex-direction: column; flex: 1; overflow: hidden; }
+  #grid-container { flex: 1; overflow-x: auto; overflow-y: auto; padding: 14px; }
+  .meal-grid { display: grid; grid-template-columns: repeat(7, minmax(155px, 1fr)); gap: 10px; min-width: 1085px; }
 
-  #grid-container { flex: 1; overflow-x: auto; overflow-y: auto; padding: 16px; }
-  .meal-grid { display: grid; grid-template-columns: repeat(7, minmax(150px, 1fr)); gap: 10px; min-width: 1050px; }
-
-  .day-col { display: flex; flex-direction: column; gap: 8px; }
-
-  .day-header { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px; text-align: center; }
-  .day-name { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 12px; }
-  .day-date { font-size: 10px; color: var(--muted); margin-top: 2px; }
+  .day-col { display: flex; flex-direction: column; gap: 7px; }
+  .day-header { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 7px 10px; text-align: center; }
+  .day-name { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 11px; }
+  .day-date { font-size: 10px; color: var(--muted); margin-top: 1px; }
   .day-header.today { border-color: var(--accent); }
   .day-header.today .day-name { color: var(--accent); }
+  .day-header.past { opacity: 0.55; }
 
-  .meal-card {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: var(--radius); padding: 10px; cursor: pointer;
-    transition: border-color 0.15s, background 0.15s;
-    min-height: 80px; display: flex; flex-direction: column; gap: 4px;
-  }
+  .meal-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 9px; cursor: pointer; transition: border-color 0.15s, background 0.15s; min-height: 76px; display: flex; flex-direction: column; gap: 3px; }
   .meal-card:hover { border-color: var(--accent); background: var(--surface2); }
   .meal-label { font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; font-weight: 500; }
   .meal-label.vegetarian { color: var(--accent); }
   .meal-label.kids { color: var(--accent2); }
-  .meal-name { font-size: 12px; color: var(--text); line-height: 1.4; flex: 1; }
-  .meal-empty { font-size: 11px; color: var(--muted); font-style: italic; flex: 1; display: flex; align-items: center; }
-  .meal-has-recipe { font-size: 9px; color: var(--muted); margin-top: 2px; }
+  .meal-name { font-size: 11px; color: var(--text); line-height: 1.4; flex: 1; }
+  .meal-empty { font-size: 10px; color: var(--muted); font-style: italic; flex: 1; display: flex; align-items: center; }
+  .meal-hint { font-size: 9px; color: var(--muted); }
+
+  /* Thaw reminder */
+  .thaw-card { background: rgba(74,180,240,0.06); border: 1px solid rgba(74,180,240,0.25); border-radius: 8px; padding: 6px 9px; display: flex; align-items: flex-start; gap: 5px; }
+  .thaw-icon { font-size: 13px; flex-shrink: 0; line-height: 1.4; }
+  .thaw-text { font-size: 10px; color: var(--accent3); line-height: 1.4; }
+  .thaw-label { font-size: 9px; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; }
 
   /* ── Chat panel ── */
-  #chat-panel { background: var(--surface); border-top: 1px solid var(--border); flex-shrink: 0; display: flex; flex-direction: column; transition: height 0.25s ease; height: 48px; overflow: hidden; }
-  #chat-panel.open { height: 300px; }
-  #chat-toggle { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; cursor: pointer; user-select: none; flex-shrink: 0; font-size: 12px; color: var(--muted); }
+  #chat-panel { background: var(--surface); border-top: 1px solid var(--border); flex-shrink: 0; display: flex; flex-direction: column; transition: height 0.25s ease; height: 44px; overflow: hidden; }
+  #chat-panel.open { height: 280px; }
+  #chat-toggle { display: flex; align-items: center; justify-content: space-between; padding: 11px 16px; cursor: pointer; user-select: none; flex-shrink: 0; font-size: 11px; color: var(--muted); }
   #chat-toggle:hover { color: var(--text); }
-  #chat-toggle .chevron { font-size: 10px; transition: transform 0.2s; }
+  #chat-toggle .chevron { font-size: 9px; transition: transform 0.2s; }
   #chat-panel.open #chat-toggle .chevron { transform: rotate(180deg); }
-  #chat-messages { flex: 1; overflow-y: auto; padding: 0 16px 8px; display: flex; flex-direction: column; gap: 8px; }
+  #chat-messages { flex: 1; overflow-y: auto; padding: 0 14px 6px; display: flex; flex-direction: column; gap: 6px; }
   #chat-messages::-webkit-scrollbar { width: 3px; }
   #chat-messages::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
-  .msg { max-width: 80%; padding: 8px 12px; border-radius: 10px; font-size: 12px; line-height: 1.5; }
+  .msg { max-width: 80%; padding: 7px 11px; border-radius: 9px; font-size: 11px; line-height: 1.5; }
   .msg.user { background: var(--surface2); border: 1px solid var(--border); align-self: flex-end; }
   .msg.assistant { background: rgba(74,240,160,0.07); border: 1px solid rgba(74,240,160,0.2); align-self: flex-start; }
-  #chat-input-row { display: flex; gap: 8px; padding: 8px 16px 12px; flex-shrink: 0; }
-  #chat-input { flex: 1; background: var(--surface2); border: 1px solid var(--border); color: var(--text); font-family: 'DM Mono', monospace; font-size: 12px; padding: 8px 12px; border-radius: 8px; resize: none; height: 38px; outline: none; transition: border-color 0.15s; }
+  .thinking { display: flex; align-items: center; gap: 7px; padding: 5px 11px; font-size: 10px; color: var(--muted); align-self: flex-start; }
+  .dots { display: flex; gap: 3px; }
+  .dots span { width: 4px; height: 4px; background: var(--accent); border-radius: 50%; animation: bounce 1.2s ease-in-out infinite; }
+  .dots span:nth-child(2) { animation-delay: 0.2s; }
+  .dots span:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes bounce { 0%,80%,100% { transform:scale(0.6);opacity:0.4; } 40% { transform:scale(1);opacity:1; } }
+  #chat-input-row { display: flex; gap: 7px; padding: 6px 14px 10px; flex-shrink: 0; }
+  #chat-input { flex: 1; background: var(--surface2); border: 1px solid var(--border); color: var(--text); font-family: 'DM Mono', monospace; font-size: 11px; padding: 7px 11px; border-radius: 8px; resize: none; height: 36px; outline: none; transition: border-color 0.15s; }
   #chat-input:focus { border-color: var(--accent); }
   #chat-input::placeholder { color: var(--muted); }
 
   /* ── Recipe modal ── */
-  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.65); display: flex; align-items: center; justify-content: center; z-index: 100; padding: 20px; }
+  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.65); display: flex; align-items: center; justify-content: center; z-index: 100; padding: 16px; }
   .modal-overlay.hidden { display: none; }
-  .modal { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); width: 100%; max-width: 520px; max-height: 90dvh; display: flex; flex-direction: column; overflow: hidden; }
-
-  .modal-header { padding: 16px 20px 12px; border-bottom: 1px solid var(--border); flex-shrink: 0; display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+  .modal { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); width: 100%; max-width: 500px; max-height: 90dvh; display: flex; flex-direction: column; overflow: hidden; }
+  .modal-header { padding: 14px 18px 10px; border-bottom: 1px solid var(--border); flex-shrink: 0; display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
   .modal-header-text { flex: 1; min-width: 0; }
-  .modal-meta { font-size: 10px; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 4px; }
-  .modal-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 16px; }
-  .modal-title-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 8px; }
-  .time-badge { display: inline-flex; align-items: center; gap: 4px; background: var(--surface2); border: 1px solid var(--border); border-radius: 6px; padding: 3px 8px; font-size: 11px; color: var(--accent2); flex-shrink: 0; }
-  .servings-row { display: flex; align-items: center; gap: 8px; font-size: 11px; color: var(--muted); }
-  .servings-btn { background: var(--surface2); border: 1px solid var(--border); color: var(--text); width: 24px; height: 24px; border-radius: 6px; cursor: pointer; font-size: 14px; line-height: 1; display: flex; align-items: center; justify-content: center; transition: border-color 0.15s; }
+  .modal-meta { font-size: 9px; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 3px; }
+  .modal-title-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 6px; }
+  .modal-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 15px; }
+  .time-badge { display: inline-flex; align-items: center; gap: 3px; background: var(--surface2); border: 1px solid var(--border); border-radius: 5px; padding: 2px 7px; font-size: 10px; color: var(--accent2); flex-shrink: 0; }
+  .servings-row { display: flex; align-items: center; gap: 7px; font-size: 10px; color: var(--muted); }
+  .servings-btn { background: var(--surface2); border: 1px solid var(--border); color: var(--text); width: 22px; height: 22px; border-radius: 5px; cursor: pointer; font-size: 13px; line-height: 1; display: flex; align-items: center; justify-content: center; transition: border-color 0.15s; }
   .servings-btn:hover { border-color: var(--accent); color: var(--accent); }
-  .servings-count { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 13px; color: var(--text); min-width: 18px; text-align: center; }
-  .modal-close { background: none; border: none; color: var(--muted); font-size: 20px; cursor: pointer; line-height: 1; padding: 2px; flex-shrink: 0; }
+  .servings-count { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 12px; color: var(--text); min-width: 16px; text-align: center; }
+  .modal-close { background: none; border: none; color: var(--muted); font-size: 18px; cursor: pointer; line-height: 1; padding: 2px; flex-shrink: 0; }
   .modal-close:hover { color: var(--text); }
-
-  /* View mode */
-  .modal-body { flex: 1; overflow-y: auto; padding: 16px 20px; display: flex; flex-direction: column; gap: 16px; }
-  .modal-body::-webkit-scrollbar { width: 4px; }
+  .modal-body { flex: 1; overflow-y: auto; padding: 14px 18px; display: flex; flex-direction: column; gap: 14px; }
+  .modal-body::-webkit-scrollbar { width: 3px; }
   .modal-body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
-
-  .recipe-description { font-size: 12px; color: var(--muted); line-height: 1.6; }
-
-  .recipe-section-label { font-size: 10px; color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 6px; }
-  .ingredients-list { list-style: none; display: flex; flex-direction: column; gap: 4px; }
-  .ingredients-list li { font-size: 12px; color: var(--text); padding: 5px 10px; background: var(--surface2); border-radius: 6px; line-height: 1.4; }
-  .instructions-text { font-size: 12px; color: var(--text); line-height: 1.8; white-space: pre-wrap; }
-
-  .modal-empty { font-size: 12px; color: var(--muted); font-style: italic; padding: 8px 0; }
-
-  .modal-footer { padding: 12px 20px; border-top: 1px solid var(--border); display: flex; gap: 8px; justify-content: flex-end; flex-shrink: 0; }
-  .btn-danger { background: none; border: 1px solid #f06060; color: #f06060; font-family: 'DM Mono', monospace; font-size: 11px; padding: 6px 12px; border-radius: 8px; cursor: pointer; }
+  .recipe-description { font-size: 11px; color: var(--muted); line-height: 1.6; }
+  .recipe-section-label { font-size: 9px; color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 5px; }
+  .ingredients-list { list-style: none; display: flex; flex-direction: column; gap: 3px; }
+  .ingredients-list li { font-size: 11px; color: var(--text); padding: 4px 9px; background: var(--surface2); border-radius: 5px; line-height: 1.4; }
+  .instructions-text { font-size: 11px; color: var(--text); line-height: 1.8; white-space: pre-wrap; }
+  .modal-footer { padding: 10px 18px; border-top: 1px solid var(--border); display: flex; gap: 7px; justify-content: flex-end; flex-shrink: 0; flex-wrap: wrap; }
+  .btn-danger { background: none; border: 1px solid var(--danger); color: var(--danger); font-family: 'DM Mono', monospace; font-size: 10px; padding: 5px 10px; border-radius: 7px; cursor: pointer; }
   .btn-danger:hover { background: rgba(240,96,96,0.1); }
-
-  /* Edit mode */
-  .edit-mode { display: none; flex-direction: column; gap: 12px; padding: 16px 20px; flex: 1; overflow-y: auto; }
+  .btn-fav { background: none; border: 1px solid var(--border); color: var(--muted); font-family: 'DM Mono', monospace; font-size: 10px; padding: 5px 10px; border-radius: 7px; cursor: pointer; transition: all 0.15s; }
+  .btn-fav.active { border-color: var(--accent2); color: var(--accent2); }
+  .btn-fav:hover { border-color: var(--accent2); color: var(--accent2); }
+  .edit-mode { display: none; flex-direction: column; gap: 10px; padding: 14px 18px; flex: 1; overflow-y: auto; }
   .edit-mode.active { display: flex; }
   .modal-body.hidden { display: none; }
   .modal-footer.hidden { display: none; }
-
-  .edit-label { font-size: 10px; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; display: block; margin-bottom: 4px; }
-  .edit-input, .edit-textarea { width: 100%; background: var(--surface2); border: 1px solid var(--border); color: var(--text); font-family: 'DM Mono', monospace; font-size: 12px; padding: 8px 10px; border-radius: 8px; outline: none; transition: border-color 0.15s; }
+  .edit-label { font-size: 9px; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; display: block; margin-bottom: 3px; }
+  .edit-input, .edit-textarea { width: 100%; background: var(--surface2); border: 1px solid var(--border); color: var(--text); font-family: 'DM Mono', monospace; font-size: 11px; padding: 7px 9px; border-radius: 7px; outline: none; transition: border-color 0.15s; }
   .edit-input:focus, .edit-textarea:focus { border-color: var(--accent); }
-  .edit-textarea { resize: vertical; min-height: 80px; }
-  .edit-footer { padding: 12px 20px; border-top: 1px solid var(--border); display: flex; gap: 8px; justify-content: flex-end; flex-shrink: 0; }
+  .edit-textarea { resize: vertical; min-height: 70px; }
+  .edit-footer { padding: 10px 18px; border-top: 1px solid var(--border); display: flex; gap: 7px; justify-content: flex-end; flex-shrink: 0; }
 
-  /* ── Spinner ── */
-  .spinner { display: inline-block; width: 12px; height: 12px; border: 2px solid rgba(74,240,160,0.3); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.6s linear infinite; }
+  /* ── Favorites modal ── */
+  .fav-modal { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); width: 100%; max-width: 420px; max-height: 80dvh; display: flex; flex-direction: column; overflow: hidden; }
+  .fav-header { padding: 14px 18px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
+  .fav-header h2 { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 14px; }
+  .fav-body { flex: 1; overflow-y: auto; padding: 12px 18px; display: flex; flex-direction: column; gap: 6px; }
+  .fav-empty { font-size: 11px; color: var(--muted); font-style: italic; padding: 8px 0; }
+  .fav-group-label { font-size: 9px; color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase; margin-top: 4px; }
+  .fav-item { display: flex; align-items: center; justify-content: space-between; background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px; gap: 8px; }
+  .fav-item-name { font-size: 11px; color: var(--text); }
+  .fav-remove { background: none; border: none; color: var(--muted); font-size: 16px; cursor: pointer; line-height: 1; }
+  .fav-remove:hover { color: var(--danger); }
+
+  /* ── Spinner / Toast ── */
+  .spinner { display: inline-block; width: 11px; height: 11px; border: 2px solid rgba(74,240,160,0.3); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.6s linear infinite; }
   @keyframes spin { to { transform: rotate(360deg); } }
-
-  /* ── Thinking indicator ── */
-  .thinking { display: flex; align-items: center; gap: 8px; padding: 6px 12px; font-size: 11px; color: var(--muted); align-self: flex-start; }
-  .dots { display: flex; gap: 3px; }
-  .dots span { width: 5px; height: 5px; background: var(--accent); border-radius: 50%; animation: bounce 1.2s ease-in-out infinite; }
-  .dots span:nth-child(2) { animation-delay: 0.2s; }
-  .dots span:nth-child(3) { animation-delay: 0.4s; }
-  @keyframes bounce { 0%,80%,100% { transform: scale(0.6); opacity:0.4; } 40% { transform: scale(1); opacity:1; } }
-
-  /* ── Toast ── */
-  #toast { position: fixed; bottom: 60px; left: 50%; transform: translateX(-50%); background: var(--surface); border: 1px solid var(--accent); color: var(--text); font-size: 12px; padding: 8px 16px; border-radius: 8px; z-index: 200; opacity: 0; transition: opacity 0.2s; pointer-events: none; }
+  #toast { position: fixed; bottom: 52px; left: 50%; transform: translateX(-50%); background: var(--surface); border: 1px solid var(--accent); color: var(--text); font-size: 11px; padding: 7px 14px; border-radius: 8px; z-index: 200; opacity: 0; transition: opacity 0.2s; pointer-events: none; white-space: nowrap; }
   #toast.show { opacity: 1; }
 </style>
 </head>
@@ -159,11 +159,14 @@
     </div>
   </div>
   <div class="week-tabs">
+    <button class="tab" data-offset="-2">2 uger siden</button>
+    <button class="tab" data-offset="-1">Forrige uge</button>
     <button class="tab active" data-offset="0">Denne uge</button>
     <button class="tab" data-offset="1">Næste uge</button>
     <button class="tab" data-offset="2">Om 2 uger</button>
   </div>
-  <div>
+  <div class="header-right">
+    <button class="btn-icon" id="favs-btn" title="Favoritter">⭐</button>
     <button class="btn" id="generate-btn">Generer uge</button>
   </div>
 </header>
@@ -172,7 +175,6 @@
   <div id="grid-container">
     <div class="meal-grid" id="meal-grid"></div>
   </div>
-
   <div id="chat-panel">
     <div id="chat-toggle">
       <span>Snak med assistenten</span>
@@ -180,7 +182,7 @@
     </div>
     <div id="chat-messages"></div>
     <div id="chat-input-row">
-      <textarea id="chat-input" placeholder="Bed assistenten om at ændre noget… fx 'Lav torsdag om til suppe' eller 'Byt alle børneretter næste uge'"></textarea>
+      <textarea id="chat-input" placeholder="Bed assistenten om at ændre noget…"></textarea>
       <button class="btn" id="send-btn">Send</button>
     </div>
   </div>
@@ -205,8 +207,6 @@
       </div>
       <button class="modal-close" id="modal-close">✕</button>
     </div>
-
-    <!-- View mode -->
     <div class="modal-body" id="modal-body">
       <div class="recipe-description" id="recipe-description"></div>
       <div id="ingredients-section">
@@ -220,11 +220,10 @@
     </div>
     <div class="modal-footer" id="modal-footer">
       <button class="btn-danger" id="modal-delete">Ryd ret</button>
+      <button class="btn-fav" id="modal-fav-btn">⭐ Favorit</button>
       <button class="btn-ghost" id="modal-edit-btn">Rediger</button>
       <button class="btn" id="modal-close-btn">Luk</button>
     </div>
-
-    <!-- Edit mode -->
     <div class="edit-mode" id="edit-mode">
       <div>
         <label class="edit-label">Navn på retten</label>
@@ -232,25 +231,23 @@
       </div>
       <div>
         <label class="edit-label">Kort beskrivelse</label>
-        <input type="text" class="edit-input" id="edit-description" placeholder="Kort beskrivelse…">
+        <input type="text" class="edit-input" id="edit-description">
       </div>
-      <div style="display:flex;gap:10px">
-        <div style="flex:1">
-          <label class="edit-label">Tilberedningstid</label>
-          <input type="text" class="edit-input" id="edit-total-time" placeholder="fx 30 min">
-        </div>
-        <div style="width:100px">
-          <label class="edit-label">Portioner</label>
-          <input type="number" class="edit-input" id="edit-servings" min="1" max="20" placeholder="5">
-        </div>
+      <div style="display:flex;gap:8px">
+        <div style="flex:1"><label class="edit-label">Tilberedningstid</label><input type="text" class="edit-input" id="edit-total-time" placeholder="fx 30 min"></div>
+        <div style="width:90px"><label class="edit-label">Portioner</label><input type="number" class="edit-input" id="edit-servings" min="1" max="20"></div>
       </div>
       <div>
-        <label class="edit-label">Ingredienser (én per linje, med mængder)</label>
-        <textarea class="edit-textarea" id="edit-ingredients" placeholder="200g fusilli&#10;1 dåse hakkede tomater&#10;2 fed hvidløg" style="min-height:100px"></textarea>
+        <label class="edit-label">Ingredienser (én per linje)</label>
+        <textarea class="edit-textarea" id="edit-ingredients" style="min-height:90px"></textarea>
       </div>
       <div>
         <label class="edit-label">Fremgangsmåde</label>
-        <textarea class="edit-textarea" id="edit-instructions" placeholder="1. Kog pastaen…&#10;2. Svits løg og hvidløg…" style="min-height:120px"></textarea>
+        <textarea class="edit-textarea" id="edit-instructions" style="min-height:110px"></textarea>
+      </div>
+      <div>
+        <label class="edit-label">Optø dagen før (lad stå tomt hvis intet)</label>
+        <input type="text" class="edit-input" id="edit-thaw" placeholder="fx 400g hakket oksekød">
       </div>
     </div>
     <div class="edit-footer hidden" id="edit-footer">
@@ -260,29 +257,49 @@
   </div>
 </div>
 
+<!-- Favorites modal -->
+<div class="modal-overlay hidden" id="fav-overlay">
+  <div class="fav-modal">
+    <div class="fav-header">
+      <h2>⭐ Favoritretter</h2>
+      <button class="modal-close" id="fav-close">✕</button>
+    </div>
+    <div class="fav-body" id="fav-body"></div>
+  </div>
+</div>
+
 <div id="toast"></div>
 
 <script>
 const DAY_NAMES = ['Mandag','Tirsdag','Onsdag','Torsdag','Fredag','Lørdag','Søndag'];
 const MONTH_NAMES = ['jan','feb','mar','apr','maj','jun','jul','aug','sep','okt','nov','dec'];
 
-let state = { plan: {}, weekOffset: 0, generating: false, sending: false };
-let editTarget = null; // { date, mealType }
+let state = { plan: {}, weekOffset: 0, generating: false, sending: false, favorites: [] };
+let editTarget = null;
+let modalServings = 0, modalBaseServings = 0, modalBaseIngredients = [];
 
-// ── Date helpers ── //
-function getMonday(d) {
-  const day = d.getDay() || 7;
-  const mon = new Date(d);
-  mon.setDate(d.getDate() - day + 1);
-  mon.setHours(0,0,0,0);
-  return mon;
+// ── Date helpers (LOCAL time, not UTC) ── //
+function localDate() {
+  const d = new Date();
+  return new Date(d.getFullYear(), d.getMonth(), d.getDate());
+}
+function todayISO() {
+  const d = localDate();
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+function isoDate(d) {
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
 }
 function addDays(d, n) { const r = new Date(d); r.setDate(r.getDate() + n); return r; }
-function isoDate(d) { return d.toISOString().slice(0,10); }
-function todayISO() { return isoDate(new Date()); }
+function dayOfWeekMon(d) { return (d.getDay() + 6) % 7; } // 0=Mon … 6=Sun
 function formatDayDate(d) { return `${d.getDate()}. ${MONTH_NAMES[d.getMonth()]}`; }
 
-// ── Load plan ── //
+// Rolling week: start = today + offset * 7
+function getStartDate(offset) {
+  return addDays(localDate(), offset * 7);
+}
+
+// ── Load data ── //
 async function loadPlan() {
   const res = await fetch('api/plan');
   if (!res.ok) return;
@@ -290,29 +307,47 @@ async function loadPlan() {
   renderGrid();
 }
 
+async function loadFavorites() {
+  const res = await fetch('api/favorites');
+  if (!res.ok) return;
+  state.favorites = await res.json();
+}
+
 // ── Render grid ── //
 function renderGrid() {
   const grid = document.getElementById('meal-grid');
   const today = todayISO();
-  const thisMonday = getMonday(new Date());
-  const weekStart = addDays(thisMonday, state.weekOffset * 7);
-
+  const startDate = getStartDate(state.weekOffset);
   grid.innerHTML = '';
+
   for (let i = 0; i < 7; i++) {
-    const d = addDays(weekStart, i);
+    const d = addDays(startDate, i);
     const key = isoDate(d);
     const isToday = key === today;
+    const isPast = key < today;
+    const nextKey = isoDate(addDays(d, 1));
 
     const col = document.createElement('div');
     col.className = 'day-col';
 
+    // Day header
     const header = document.createElement('div');
-    header.className = `day-header${isToday ? ' today' : ''}`;
-    header.innerHTML = `<div class="day-name">${DAY_NAMES[i]}</div><div class="day-date">${formatDayDate(d)}</div>`;
+    header.className = `day-header${isToday ? ' today' : ''}${isPast ? ' past' : ''}`;
+    header.innerHTML = `<div class="day-name">${DAY_NAMES[dayOfWeekMon(d)]}</div><div class="day-date">${formatDayDate(d)}</div>`;
     col.appendChild(header);
 
     col.appendChild(makeMealCard(key, 'vegetarian'));
     col.appendChild(makeMealCard(key, 'kids'));
+
+    // Thaw reminder: what needs to come out of freezer today for tomorrow's kids dish
+    const tomorrowKids = state.plan[nextKey]?.kids;
+    if (tomorrowKids?.thaw) {
+      const thaw = document.createElement('div');
+      thaw.className = 'thaw-card';
+      thaw.innerHTML = `<div class="thaw-icon">🧊</div><div class="thaw-text"><div class="thaw-label">Optø til i morgen</div>${escapeHtml(tomorrowKids.thaw)}</div>`;
+      col.appendChild(thaw);
+    }
+
     grid.appendChild(col);
   }
 }
@@ -320,23 +355,19 @@ function renderGrid() {
 function makeMealCard(dateKey, mealType) {
   const card = document.createElement('div');
   card.className = 'meal-card';
-
   const mealData = state.plan[dateKey]?.[mealType];
   const label = document.createElement('div');
   label.className = `meal-label ${mealType}`;
   label.textContent = mealType === 'vegetarian' ? 'Vegetarret' : 'Børneret';
   card.appendChild(label);
-
-  if (mealData && mealData.name) {
+  if (mealData?.name) {
     const name = document.createElement('div');
     name.className = 'meal-name';
     name.textContent = mealData.name;
     card.appendChild(name);
-
-    const hasRecipe = mealData.ingredients?.length > 0 || mealData.instructions;
-    if (hasRecipe) {
+    if (mealData.ingredients?.length || mealData.instructions) {
       const hint = document.createElement('div');
-      hint.className = 'meal-has-recipe';
+      hint.className = 'meal-hint';
       hint.textContent = '📖 Se opskrift';
       card.appendChild(hint);
     }
@@ -346,40 +377,31 @@ function makeMealCard(dateKey, mealType) {
     empty.textContent = 'Ingen ret planlagt';
     card.appendChild(empty);
   }
-
   card.addEventListener('click', () => openModal(dateKey, mealType));
   return card;
 }
 
-// ── Ingredient scaling ── //
-// Scale all leading numbers in an ingredient string by ratio, rounding sensibly.
-function scaleIngredient(ingredient, ratio) {
-  if (ratio === 1) return ingredient;
-  return ingredient.replace(/\b(\d+(?:[.,]\d+)?)/g, (match, num) => {
+function escapeHtml(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+// ── Recipe modal ── //
+function openModal(dateKey, mealType) {
+  editTarget = { date: dateKey, mealType };
+  const d = new Date(dateKey + 'T12:00:00');
+  const typeLabel = mealType === 'vegetarian' ? 'Vegetarret' : 'Børneret';
+  document.getElementById('modal-meta').textContent = `${DAY_NAMES[dayOfWeekMon(d)]} ${formatDayDate(d)} · ${typeLabel}`;
+  showViewMode(state.plan[dateKey]?.[mealType]);
+  document.getElementById('modal-overlay').classList.remove('hidden');
+}
+
+function scaleIngredient(ing, ratio) {
+  if (ratio === 1) return ing;
+  return ing.replace(/\b(\d+(?:[.,]\d+)?)/g, (_, num) => {
     const val = parseFloat(num.replace(',', '.')) * ratio;
     if (val >= 100) return Math.round(val).toString();
     if (val >= 10)  return (Math.round(val * 2) / 2).toString().replace('.', ',');
     if (val >= 1)   return (Math.round(val * 4) / 4).toString().replace('.', ',');
     return (Math.round(val * 8) / 8).toString().replace('.', ',');
   });
-}
-
-// ── Modal ── //
-let modalServings = 0;      // currently displayed serving count
-let modalBaseServings = 0;  // original servings the recipe was made for
-let modalBaseIngredients = []; // original (unscaled) ingredients
-
-function openModal(dateKey, mealType) {
-  editTarget = { date: dateKey, mealType };
-  const d = new Date(dateKey + 'T00:00:00');
-  const dayName = DAY_NAMES[d.getDay() === 0 ? 6 : d.getDay() - 1];
-  const typeLabel = mealType === 'vegetarian' ? 'Vegetarret' : 'Børneret';
-
-  document.getElementById('modal-meta').textContent = `${dayName} ${formatDayDate(d)}`;
-  const mealData = state.plan[dateKey]?.[mealType];
-
-  showViewMode(mealData, typeLabel);
-  document.getElementById('modal-overlay').classList.remove('hidden');
 }
 
 function renderIngredients(ingredients, ratio) {
@@ -392,49 +414,47 @@ function renderIngredients(ingredients, ratio) {
   });
 }
 
-function showViewMode(mealData, typeLabel) {
-  document.getElementById('modal-title').textContent = mealData?.name || typeLabel;
+function showViewMode(mealData) {
+  document.getElementById('modal-title').textContent = mealData?.name || '—';
   document.getElementById('recipe-description').textContent = mealData?.description || '';
 
-  // Time badge
   const timeBadge = document.getElementById('time-badge');
-  const timeVal = mealData?.total_time || '';
-  if (timeVal) {
-    document.getElementById('time-value').textContent = timeVal;
+  if (mealData?.total_time) {
+    document.getElementById('time-value').textContent = mealData.total_time;
     timeBadge.style.display = '';
-  } else {
-    timeBadge.style.display = 'none';
-  }
+  } else { timeBadge.style.display = 'none'; }
 
-  // Servings
   modalBaseIngredients = mealData?.ingredients || [];
   modalBaseServings = mealData?.servings || 0;
-  modalServings = modalBaseServings || 0;
+  modalServings = modalBaseServings;
 
   const servingsRow = document.getElementById('servings-row');
   if (modalBaseServings > 0) {
     document.getElementById('servings-count').textContent = modalServings;
     servingsRow.style.display = '';
-  } else {
-    servingsRow.style.display = 'none';
-  }
+  } else { servingsRow.style.display = 'none'; }
 
-  // Ingredients
-  const ratio = (modalBaseServings > 0 && modalServings > 0) ? modalServings / modalBaseServings : 1;
-  if (modalBaseIngredients.length > 0) {
+  const ratio = modalBaseServings > 0 ? modalServings / modalBaseServings : 1;
+  if (modalBaseIngredients.length) {
     renderIngredients(modalBaseIngredients, ratio);
     document.getElementById('ingredients-section').style.display = '';
   } else {
     document.getElementById('ingredients-section').style.display = mealData ? 'none' : '';
   }
 
-  const instructions = mealData?.instructions || '';
-  document.getElementById('instructions-text').textContent = instructions;
-  document.getElementById('instructions-section').style.display = instructions ? '' : 'none';
+  const instr = mealData?.instructions || '';
+  document.getElementById('instructions-text').textContent = instr;
+  document.getElementById('instructions-section').style.display = instr ? '' : 'none';
 
-  if (!mealData || !mealData.name) {
-    document.getElementById('recipe-description').textContent = 'Ingen ret planlagt endnu. Klik Rediger for at tilføje manuelt, eller brug Generer uge.';
+  if (!mealData?.name) {
+    document.getElementById('recipe-description').textContent = 'Ingen ret planlagt. Klik Rediger eller brug Generer uge.';
   }
+
+  // Favorite button state
+  const isFav = state.favorites.some(f => f.name === mealData?.name && f.meal_type === editTarget?.mealType);
+  const favBtn = document.getElementById('modal-fav-btn');
+  favBtn.textContent = isFav ? '★ Fjern favorit' : '⭐ Tilføj favorit';
+  favBtn.classList.toggle('active', isFav);
 
   document.getElementById('modal-body').classList.remove('hidden');
   document.getElementById('modal-footer').classList.remove('hidden');
@@ -450,28 +470,13 @@ function showEditMode() {
   document.getElementById('edit-servings').value = mealData?.servings || '';
   document.getElementById('edit-ingredients').value = (mealData?.ingredients || []).join('\n');
   document.getElementById('edit-instructions').value = mealData?.instructions || '';
-
+  document.getElementById('edit-thaw').value = mealData?.thaw || '';
   document.getElementById('modal-body').classList.add('hidden');
   document.getElementById('modal-footer').classList.add('hidden');
   document.getElementById('edit-mode').classList.add('active');
   document.getElementById('edit-footer').classList.remove('hidden');
   document.getElementById('edit-name').focus();
 }
-
-// Servings +/- buttons
-document.getElementById('servings-dec').addEventListener('click', () => {
-  if (modalServings <= 1) return;
-  modalServings--;
-  document.getElementById('servings-count').textContent = modalServings;
-  const ratio = modalBaseServings > 0 ? modalServings / modalBaseServings : 1;
-  renderIngredients(modalBaseIngredients, ratio);
-});
-document.getElementById('servings-inc').addEventListener('click', () => {
-  modalServings++;
-  document.getElementById('servings-count').textContent = modalServings;
-  const ratio = modalBaseServings > 0 ? modalServings / modalBaseServings : 1;
-  renderIngredients(modalBaseIngredients, ratio);
-});
 
 function closeModal() {
   document.getElementById('modal-overlay').classList.add('hidden');
@@ -480,39 +485,44 @@ function closeModal() {
 
 document.getElementById('modal-close').addEventListener('click', closeModal);
 document.getElementById('modal-close-btn').addEventListener('click', closeModal);
-document.getElementById('modal-overlay').addEventListener('click', (e) => {
-  if (e.target === document.getElementById('modal-overlay')) closeModal();
-});
+document.getElementById('modal-overlay').addEventListener('click', e => { if (e.target === document.getElementById('modal-overlay')) closeModal(); });
 document.getElementById('modal-edit-btn').addEventListener('click', showEditMode);
-document.getElementById('edit-cancel').addEventListener('click', () => {
-  const mealData = state.plan[editTarget?.date]?.[editTarget?.mealType];
-  const typeLabel = editTarget?.mealType === 'vegetarian' ? 'Vegetarret' : 'Børneret';
-  showViewMode(mealData, typeLabel);
+document.getElementById('edit-cancel').addEventListener('click', () => showViewMode(state.plan[editTarget?.date]?.[editTarget?.mealType]));
+
+document.getElementById('servings-dec').addEventListener('click', () => {
+  if (modalServings <= 1) return;
+  modalServings--;
+  document.getElementById('servings-count').textContent = modalServings;
+  renderIngredients(modalBaseIngredients, modalBaseServings > 0 ? modalServings / modalBaseServings : 1);
+});
+document.getElementById('servings-inc').addEventListener('click', () => {
+  modalServings++;
+  document.getElementById('servings-count').textContent = modalServings;
+  renderIngredients(modalBaseIngredients, modalBaseServings > 0 ? modalServings / modalBaseServings : 1);
 });
 
 document.getElementById('edit-save').addEventListener('click', async () => {
   if (!editTarget) return;
   const name = document.getElementById('edit-name').value.trim();
-  if (!name) { showToast('Angiv venligst et navn på retten'); return; }
-  const description = document.getElementById('edit-description').value.trim();
-  const total_time = document.getElementById('edit-total-time').value.trim();
-  const servings = parseInt(document.getElementById('edit-servings').value) || 0;
-  const ingredients = document.getElementById('edit-ingredients').value.split('\n').map(s => s.trim()).filter(Boolean);
-  const instructions = document.getElementById('edit-instructions').value.trim();
-
+  if (!name) { showToast('Angiv venligst et navn'); return; }
+  const meal = {
+    name,
+    description: document.getElementById('edit-description').value.trim(),
+    total_time: document.getElementById('edit-total-time').value.trim(),
+    servings: parseInt(document.getElementById('edit-servings').value) || 0,
+    ingredients: document.getElementById('edit-ingredients').value.split('\n').map(s => s.trim()).filter(Boolean),
+    instructions: document.getElementById('edit-instructions').value.trim(),
+    thaw: document.getElementById('edit-thaw').value.trim(),
+  };
   await fetch('api/meal', {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ date: editTarget.date, meal_type: editTarget.mealType, name, description, total_time, servings, ingredients, instructions }),
+    body: JSON.stringify({ date: editTarget.date, meal_type: editTarget.mealType, ...meal }),
   });
-
   if (!state.plan[editTarget.date]) state.plan[editTarget.date] = {};
-  state.plan[editTarget.date][editTarget.mealType] = { name, description, total_time, servings, ingredients, instructions };
+  state.plan[editTarget.date][editTarget.mealType] = meal;
   renderGrid();
-
-  const typeLabel = editTarget.mealType === 'vegetarian' ? 'Vegetarret' : 'Børneret';
-  document.getElementById('modal-title').textContent = name;
-  showViewMode(state.plan[editTarget.date][editTarget.mealType], typeLabel);
+  showViewMode(meal);
   showToast('Ret opdateret');
 });
 
@@ -525,6 +535,67 @@ document.getElementById('modal-delete').addEventListener('click', async () => {
   showToast('Ret ryddet');
 });
 
+document.getElementById('modal-fav-btn').addEventListener('click', async () => {
+  if (!editTarget) return;
+  const mealData = state.plan[editTarget.date]?.[editTarget.mealType];
+  if (!mealData?.name) return;
+  const existing = state.favorites.find(f => f.name === mealData.name && f.meal_type === editTarget.mealType);
+  if (existing) {
+    await fetch(`api/favorites/${existing.id}`, { method: 'DELETE' });
+    state.favorites = state.favorites.filter(f => f.id !== existing.id);
+    showToast('Fjernet fra favoritter');
+  } else {
+    const res = await fetch('api/favorites', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: mealData.name, meal_type: editTarget.mealType, description: mealData.description || '' }),
+    });
+    const data = await res.json();
+    await loadFavorites();
+    showToast(data.duplicate ? 'Allerede i favoritter' : 'Tilføjet til favoritter');
+  }
+  showViewMode(mealData);
+});
+
+// ── Favorites modal ── //
+document.getElementById('favs-btn').addEventListener('click', () => {
+  renderFavsModal();
+  document.getElementById('fav-overlay').classList.remove('hidden');
+});
+document.getElementById('fav-close').addEventListener('click', () => document.getElementById('fav-overlay').classList.add('hidden'));
+document.getElementById('fav-overlay').addEventListener('click', e => { if (e.target === document.getElementById('fav-overlay')) document.getElementById('fav-overlay').classList.add('hidden'); });
+
+function renderFavsModal() {
+  const body = document.getElementById('fav-body');
+  body.innerHTML = '';
+  if (!state.favorites.length) {
+    body.innerHTML = '<div class="fav-empty">Ingen favoritretter endnu. Åbn en opskrift og klik ⭐ for at tilføje.</div>';
+    return;
+  }
+  const groups = { vegetarian: [], kids: [] };
+  state.favorites.forEach(f => { if (groups[f.meal_type]) groups[f.meal_type].push(f); });
+
+  [['vegetarian', 'Vegetarretter'], ['kids', 'Børneretter']].forEach(([type, label]) => {
+    if (!groups[type].length) return;
+    const lbl = document.createElement('div');
+    lbl.className = 'fav-group-label';
+    lbl.textContent = label;
+    body.appendChild(lbl);
+    groups[type].forEach(f => {
+      const item = document.createElement('div');
+      item.className = 'fav-item';
+      item.innerHTML = `<div class="fav-item-name">${escapeHtml(f.name)}</div><button class="fav-remove" data-id="${f.id}">✕</button>`;
+      item.querySelector('.fav-remove').addEventListener('click', async () => {
+        await fetch(`api/favorites/${f.id}`, { method: 'DELETE' });
+        state.favorites = state.favorites.filter(x => x.id !== f.id);
+        renderFavsModal();
+        showToast('Fjernet fra favoritter');
+      });
+      body.appendChild(item);
+    });
+  });
+}
+
 // ── Week tabs ── //
 document.querySelectorAll('.tab').forEach(tab => {
   tab.addEventListener('click', () => {
@@ -535,51 +606,6 @@ document.querySelectorAll('.tab').forEach(tab => {
   });
 });
 
-// ── Polling helpers ── //
-
-// After the ingress proxy kills a long /api/generate connection the backend
-// keeps running and saves the result. Poll /api/plan until new meals appear.
-async function pollForGeneratedPlan(weekOffset, baselineNames, maxSeconds = 180, intervalMs = 5000) {
-  const deadline = Date.now() + maxSeconds * 1000;
-  const thisMonday = getMonday(new Date());
-  const weekStart = addDays(thisMonday, weekOffset * 7);
-  while (Date.now() < deadline) {
-    await new Promise(r => setTimeout(r, intervalMs));
-    try {
-      const res = await fetch('api/plan');
-      if (!res.ok) continue;
-      const plan = await res.json();
-      let newlyFilled = 0;
-      for (let i = 0; i < 7; i++) {
-        const key = isoDate(addDays(weekStart, i));
-        const name = plan[key]?.vegetarian?.name || plan[key]?.kids?.name;
-        if (name && name !== baselineNames[key]) newlyFilled++;
-      }
-      if (newlyFilled >= 4) return plan;
-    } catch {}
-  }
-  return null;
-}
-
-// After the ingress proxy kills a long /api/chat connection the backend keeps
-// running and persists the reply. Poll /api/chat-history to recover it.
-async function pollForChatReply(baseline, maxSeconds = 180, intervalMs = 5000) {
-  const deadline = Date.now() + maxSeconds * 1000;
-  while (Date.now() < deadline) {
-    await new Promise(r => setTimeout(r, intervalMs));
-    try {
-      const res = await fetch('api/chat-history');
-      if (!res.ok) continue;
-      const history = await res.json();
-      const last = history[history.length - 1];
-      if (history.length >= baseline + 2 && last?.role === 'assistant' && last.content) {
-        return last.content;
-      }
-    } catch {}
-  }
-  return null;
-}
-
 // ── Generate ── //
 document.getElementById('generate-btn').addEventListener('click', async () => {
   if (state.generating) return;
@@ -588,12 +614,10 @@ document.getElementById('generate-btn').addEventListener('click', async () => {
   btn.disabled = true;
   btn.innerHTML = '<span class="spinner"></span>';
 
-  // Snapshot current week so we can detect new meals after a connection drop
-  const thisMonday = getMonday(new Date());
-  const weekStart = addDays(thisMonday, state.weekOffset * 7);
+  const startDate = getStartDate(state.weekOffset);
   const baselineNames = {};
   for (let i = 0; i < 7; i++) {
-    const key = isoDate(addDays(weekStart, i));
+    const key = isoDate(addDays(startDate, i));
     baselineNames[key] = state.plan[key]?.vegetarian?.name || state.plan[key]?.kids?.name || null;
   }
 
@@ -606,8 +630,7 @@ document.getElementById('generate-btn').addEventListener('click', async () => {
     if (!res.ok) {
       let detail = `HTTP ${res.status}`;
       try { const err = await res.json(); detail = err.detail || detail; } catch (_) { detail = await res.text().catch(() => detail); }
-      showToast(`Fejl: ${detail}`);
-      return;
+      showToast(`Fejl: ${detail}`); return;
     }
     const weekPlan = await res.json();
     Object.assign(state.plan, weekPlan);
@@ -616,12 +639,7 @@ document.getElementById('generate-btn').addEventListener('click', async () => {
   } catch (e) {
     if (e instanceof TypeError) {
       const plan = await pollForGeneratedPlan(state.weekOffset, baselineNames);
-      if (plan) {
-        Object.assign(state.plan, plan);
-        renderGrid();
-        showToast('Madplan genereret!');
-        return;
-      }
+      if (plan) { Object.assign(state.plan, plan); renderGrid(); showToast('Madplan genereret!'); return; }
     }
     showToast(`Fejl: ${e.message}`);
   } finally {
@@ -631,12 +649,49 @@ document.getElementById('generate-btn').addEventListener('click', async () => {
   }
 });
 
+// ── Polling helpers ── //
+async function pollForGeneratedPlan(weekOffset, baselineNames, maxSeconds = 180, intervalMs = 5000) {
+  const deadline = Date.now() + maxSeconds * 1000;
+  const startDate = getStartDate(weekOffset);
+  while (Date.now() < deadline) {
+    await new Promise(r => setTimeout(r, intervalMs));
+    try {
+      const res = await fetch('api/plan');
+      if (!res.ok) continue;
+      const plan = await res.json();
+      let filled = 0;
+      for (let i = 0; i < 7; i++) {
+        const key = isoDate(addDays(startDate, i));
+        const name = plan[key]?.vegetarian?.name || plan[key]?.kids?.name;
+        if (name && name !== baselineNames[key]) filled++;
+      }
+      if (filled >= 4) return plan;
+    } catch {}
+  }
+  return null;
+}
+
+async function pollForChatReply(baseline, maxSeconds = 180, intervalMs = 5000) {
+  const deadline = Date.now() + maxSeconds * 1000;
+  while (Date.now() < deadline) {
+    await new Promise(r => setTimeout(r, intervalMs));
+    try {
+      const res = await fetch('api/chat-history');
+      if (!res.ok) continue;
+      const history = await res.json();
+      const last = history[history.length - 1];
+      if (history.length >= baseline + 2 && last?.role === 'assistant' && last.content) return last.content;
+    } catch {}
+  }
+  return null;
+}
+
 // ── Chat ── //
 document.getElementById('chat-toggle').addEventListener('click', () => {
   const panel = document.getElementById('chat-panel');
   panel.classList.toggle('open');
   if (panel.classList.contains('open')) {
-    document.getElementById('chat-messages').scrollTop = document.getElementById('chat-messages').scrollHeight;
+    document.getElementById('chat-messages').scrollTop = 99999;
     document.getElementById('chat-input').focus();
   }
 });
@@ -647,8 +702,8 @@ async function loadChatHistory() {
   const history = await res.json();
   const container = document.getElementById('chat-messages');
   container.innerHTML = '';
-  history.forEach(msg => appendMessage(msg.role, msg.content, false));
-  container.scrollTop = container.scrollHeight;
+  history.forEach(m => appendMessage(m.role, m.content, false));
+  container.scrollTop = 99999;
 }
 
 function appendMessage(role, content, scroll = true) {
@@ -657,16 +712,15 @@ function appendMessage(role, content, scroll = true) {
   div.className = `msg ${role}`;
   div.textContent = content;
   container.appendChild(div);
-  if (scroll) container.scrollTop = container.scrollHeight;
+  if (scroll) container.scrollTop = 99999;
 }
 
 function showThinking() {
   const el = document.createElement('div');
   el.className = 'thinking'; el.id = 'thinking';
   el.innerHTML = '<div class="dots"><span></span><span></span><span></span></div><span>Assistenten tænker…</span>';
-  const container = document.getElementById('chat-messages');
-  container.appendChild(el);
-  container.scrollTop = container.scrollHeight;
+  const c = document.getElementById('chat-messages');
+  c.appendChild(el); c.scrollTop = 99999;
 }
 function hideThinking() { document.getElementById('thinking')?.remove(); }
 
@@ -674,35 +728,28 @@ async function sendChat() {
   const input = document.getElementById('chat-input');
   const message = input.value.trim();
   if (!message || state.sending) return;
-
   state.sending = true;
   const sendBtn = document.getElementById('send-btn');
   sendBtn.disabled = true;
   sendBtn.innerHTML = '<span class="spinner"></span>';
-  input.value = '';
-  input.style.height = '38px';
+  input.value = ''; input.style.height = '36px';
   document.getElementById('chat-panel').classList.add('open');
   appendMessage('user', message);
   showThinking();
 
-  // Snapshot history length so we can recover the reply after a connection drop
   let historyBaseline = null;
-  try {
-    const r = await fetch('api/chat-history');
-    if (r.ok) historyBaseline = (await r.json()).length;
-  } catch {}
+  try { const r = await fetch('api/chat-history'); if (r.ok) historyBaseline = (await r.json()).length; } catch {}
 
   try {
     const res = await fetch('api/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message, week_offset: state.weekOffset }),
+      body: JSON.stringify({ message }),
     });
     if (!res.ok) {
       let detail = `HTTP ${res.status}`;
       try { const err = await res.json(); detail = err.detail || detail; } catch (_) { detail = await res.text().catch(() => detail); }
-      hideThinking(); appendMessage('assistant', `Fejl: ${detail}`);
-      return;
+      hideThinking(); appendMessage('assistant', `Fejl: ${detail}`); return;
     }
     const data = await res.json();
     hideThinking(); appendMessage('assistant', data.reply);
@@ -712,15 +759,11 @@ async function sendChat() {
       const reply = await pollForChatReply(historyBaseline);
       if (reply) {
         hideThinking(); appendMessage('assistant', reply);
-        try {
-          const r = await fetch('api/plan');
-          if (r.ok) { Object.assign(state.plan, await r.json()); renderGrid(); }
-        } catch {}
+        try { const r = await fetch('api/plan'); if (r.ok) { Object.assign(state.plan, await r.json()); renderGrid(); } } catch {}
         return;
       }
     }
-    hideThinking();
-    console.error('Chat fejl:', e);
+    hideThinking(); console.error('Chat fejl:', e);
     appendMessage('assistant', `⚠ Fejl: ${e.message}`);
   } finally {
     state.sending = false;
@@ -731,28 +774,21 @@ async function sendChat() {
 }
 
 document.getElementById('send-btn').addEventListener('click', sendChat);
-document.getElementById('chat-input').addEventListener('keydown', (e) => {
-  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendChat(); }
-});
-document.getElementById('chat-input').addEventListener('input', function() {
-  this.style.height = '38px';
-  this.style.height = Math.min(this.scrollHeight, 120) + 'px';
-});
-document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
+document.getElementById('chat-input').addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendChat(); } });
+document.getElementById('chat-input').addEventListener('input', function() { this.style.height = '36px'; this.style.height = Math.min(this.scrollHeight, 110) + 'px'; });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeModal(); document.getElementById('fav-overlay').classList.add('hidden'); } });
 
 // ── Toast ── //
 let toastTimer = null;
 function showToast(msg) {
-  const toast = document.getElementById('toast');
-  toast.textContent = msg;
-  toast.classList.add('show');
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
   clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => toast.classList.remove('show'), 3000);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 3000);
 }
 
 // ── Init ── //
-loadPlan();
-loadChatHistory();
+(async () => { await Promise.all([loadPlan(), loadFavorites(), loadChatHistory()]); })();
 </script>
 </body>
 </html>

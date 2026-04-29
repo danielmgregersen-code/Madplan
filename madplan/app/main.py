@@ -1,5 +1,6 @@
 import json
 import os
+import uuid
 from datetime import date, timedelta
 from fastapi import FastAPI, HTTPException
 from fastapi.staticfiles import StaticFiles
@@ -10,7 +11,12 @@ from agent import MealPlanAgent
 OPTIONS_FILE = "/data/options.json"
 MEAL_PLAN_FILE = "/data/meal_plan.json"
 CHAT_HISTORY_FILE = "/data/chat_history.json"
+FAVORITES_FILE = "/data/favorites.json"
 MAX_HISTORY_MESSAGES = 100
+
+# Plan window: 2 weeks back + today + 2 weeks ahead = 35 days
+DAYS_BACK = 14
+DAYS_TOTAL = 35
 
 
 def load_options() -> dict:
@@ -25,44 +31,41 @@ def load_options() -> dict:
     }
 
 
-def load_meal_plan() -> dict:
-    if os.path.exists(MEAL_PLAN_FILE):
+def _load_json(path: str, default):
+    if os.path.exists(path):
         try:
-            with open(MEAL_PLAN_FILE) as f:
+            with open(path) as f:
                 return json.load(f)
         except (json.JSONDecodeError, IOError):
-            return {}
-    return {}
+            pass
+    return default
 
+
+def _save_json(path: str, data):
+    try:
+        with open(path, "w") as f:
+            json.dump(data, f)
+    except IOError as e:
+        print(f"Advarsel: kunne ikke gemme {path}: {e}", flush=True)
+
+
+def load_meal_plan() -> dict:
+    return _load_json(MEAL_PLAN_FILE, {})
 
 def save_meal_plan(plan: dict):
-    try:
-        with open(MEAL_PLAN_FILE, "w") as f:
-            json.dump(plan, f)
-    except IOError as e:
-        print(f"Advarsel: kunne ikke gemme madplan: {e}", flush=True)
-
+    _save_json(MEAL_PLAN_FILE, plan)
 
 def load_chat_history() -> list:
-    if os.path.exists(CHAT_HISTORY_FILE):
-        try:
-            with open(CHAT_HISTORY_FILE) as f:
-                return json.load(f)
-        except (json.JSONDecodeError, IOError):
-            return []
-    return []
-
+    return _load_json(CHAT_HISTORY_FILE, [])
 
 def save_chat_history(history: list):
-    try:
-        with open(CHAT_HISTORY_FILE, "w") as f:
-            json.dump(history, f)
-    except IOError as e:
-        print(f"Advarsel: kunne ikke gemme chathistorik: {e}", flush=True)
+    _save_json(CHAT_HISTORY_FILE, history)
 
+def load_favorites() -> list:
+    return _load_json(FAVORITES_FILE, [])
 
-def monday_of_week(d: date) -> date:
-    return d - timedelta(days=d.weekday())
+def save_favorites(favs: list):
+    _save_json(FAVORITES_FILE, favs)
 
 
 def make_agent() -> MealPlanAgent:
@@ -87,12 +90,11 @@ EMPTY_DAY = {"vegetarian": None, "kids": None}
 
 
 class GenerateRequest(BaseModel):
-    week_offset: int = 0
+    week_offset: int = 0   # start = today + offset * 7 days
 
 
 class ChatRequest(BaseModel):
     message: str
-    week_offset: int = 0
 
 
 class UpdateMealRequest(BaseModel):
@@ -104,16 +106,25 @@ class UpdateMealRequest(BaseModel):
     servings: int = 0
     ingredients: List[str] = []
     instructions: str = ""
+    thaw: str = ""          # what to take out of freezer the night before (kids meals)
 
+
+class FavoriteRequest(BaseModel):
+    name: str
+    meal_type: str          # "vegetarian" or "kids"
+    description: str = ""
+
+
+# ── Plan ──
 
 @app.get("/api/plan")
 def get_plan():
     today = date.today()
-    week_start = monday_of_week(today)
+    start = today - timedelta(days=DAYS_BACK)
     plan = load_meal_plan()
     result = {}
-    for i in range(21):
-        d = week_start + timedelta(days=i)
+    for i in range(DAYS_TOTAL):
+        d = start + timedelta(days=i)
         key = d.isoformat()
         result[key] = plan.get(key, dict(EMPTY_DAY))
     return result
@@ -122,11 +133,12 @@ def get_plan():
 @app.post("/api/generate")
 async def generate_week(req: GenerateRequest):
     today = date.today()
-    week_start = monday_of_week(today) + timedelta(weeks=req.week_offset)
+    week_start = today + timedelta(days=req.week_offset * 7)
     plan = load_meal_plan()
+    favorites = load_favorites()
     try:
         agent = make_agent()
-        updated = agent.generate_week(week_start, plan)
+        updated = agent.generate_week(week_start, plan, today, favorites)
     except HTTPException:
         raise
     except Exception as e:
@@ -143,12 +155,12 @@ async def generate_week(req: GenerateRequest):
 @app.post("/api/chat")
 async def chat(req: ChatRequest):
     today = date.today()
-    week_start = monday_of_week(today)
     plan = load_meal_plan()
     history = load_chat_history()
+    favorites = load_favorites()
     try:
         agent = make_agent()
-        reply, updated_plan = agent.chat(req.message, plan, history, week_start)
+        reply, updated_plan = agent.chat(req.message, plan, history, today, favorites)
     except HTTPException:
         raise
     except Exception as e:
@@ -176,6 +188,7 @@ async def update_meal(req: UpdateMealRequest):
         "servings": req.servings,
         "ingredients": req.ingredients,
         "instructions": req.instructions,
+        "thaw": req.thaw,
     }
     save_meal_plan(plan)
     return {"ok": True}
@@ -189,6 +202,38 @@ async def delete_meal(date_str: str, meal_type: str):
         save_meal_plan(plan)
     return {"ok": True}
 
+
+# ── Favorites ──
+
+@app.get("/api/favorites")
+def get_favorites():
+    return load_favorites()
+
+
+@app.post("/api/favorites")
+async def add_favorite(req: FavoriteRequest):
+    favs = load_favorites()
+    # Avoid exact duplicates by name + meal_type
+    if any(f["name"] == req.name and f["meal_type"] == req.meal_type for f in favs):
+        return {"ok": True, "duplicate": True}
+    favs.append({
+        "id": str(uuid.uuid4()),
+        "name": req.name,
+        "meal_type": req.meal_type,
+        "description": req.description,
+    })
+    save_favorites(favs)
+    return {"ok": True}
+
+
+@app.delete("/api/favorites/{fav_id}")
+async def remove_favorite(fav_id: str):
+    favs = [f for f in load_favorites() if f["id"] != fav_id]
+    save_favorites(favs)
+    return {"ok": True}
+
+
+# ── Chat history ──
 
 @app.get("/api/chat-history")
 def get_chat_history():
